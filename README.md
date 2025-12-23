@@ -46,11 +46,14 @@ cargo build --release
 ./target/release/betfair_stream_proxy
 ```
 
-## Test client
+## CI/CD
 
-Open [test-client.html](test-client.html) in a browser, set the WebSocket URL, connect, then send:
+- CI runs on every Pull Request and on pushes to `main`.
+- Release artifacts are built and published when you push a tag matching `v*` (for example `v0.1.0`).
 
-1) `authentication` (must be first)
-2) `marketSubscription` and/or `orderSubscription`
+Suggested release flow:
 
-Note: the HTML test client sends JSON without CRLF; the proxy handles upstream CRLF framing.
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
