@@ -71,13 +71,17 @@ jobs:
 
       - name: Package (zip)
         if: matrix.archive == 'zip'
-        shell: bash
+        shell: pwsh
         run: |
-          set -euo pipefail
-          mkdir -p dist
-          cp "target/${{ matrix.target }}/release/${{ matrix.bin }}${{ matrix.ext }}" "dist/${{ matrix.bin }}-${{ matrix.target }}${{ matrix.ext }}"
-          cd dist
-          zip "${{ matrix.bin }}-${{ matrix.target }}.zip" "${{ matrix.bin }}-${{ matrix.target }}${{ matrix.ext }}"
+          $ErrorActionPreference = 'Stop'
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          $src = Join-Path -Path "target" -ChildPath "${{ matrix.target }}/release/${{ matrix.bin }}${{ matrix.ext }}"
+          $dstName = "${{ matrix.bin }}-${{ matrix.target }}${{ matrix.ext }}"
+          $dst = Join-Path -Path "dist" -ChildPath $dstName
+          Copy-Item -Force -Path $src -Destination $dst
+          $zipPath = Join-Path -Path "dist" -ChildPath "${{ matrix.bin }}-${{ matrix.target }}.zip"
+          if (Test-Path $zipPath) { Remove-Item -Force $zipPath }
+          Compress-Archive -Path $dst -DestinationPath $zipPath
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
