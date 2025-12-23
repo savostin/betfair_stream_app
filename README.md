@@ -26,6 +26,28 @@ cargo run
 - Health: `http://127.0.0.1:8080/healthz`
 - WebSocket: `ws://127.0.0.1:8080/ws`
 
+## Optional GUI
+
+Build with GUI support:
+
+```bash
+cargo build --release --features gui
+```
+
+Run with a tray icon:
+
+```bash
+./target/release/betfair_stream_proxy --gui
+```
+
+macOS note: launching the raw binary from Finder will open Terminal. To launch as a proper GUI app (no Terminal window), build and create an app bundle:
+
+```bash
+cargo build --release --features gui
+scripts/macos-bundle.sh target/release/betfair_stream_proxy dist
+open dist/betfair_stream_proxy.app
+```
+
 ## Configuration
 
 All options are available as CLI flags or environment variables (see `--help`). Key env vars:
@@ -58,6 +80,5 @@ cargo build --release
 Suggested release flow:
 
 ```bash
-git tag v1.0.1
-git push origin v1.0.1
+scripts/release.sh
 ```

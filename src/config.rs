@@ -3,6 +3,12 @@ use clap::Parser;
 #[derive(Debug, Clone, Parser)]
 #[command(name = "betfair_stream_proxy")]
 pub struct Config {
+    /// Run with a GUI (system tray icon + Exit menu).
+    ///
+    /// Requires building with `--features gui`.
+    #[arg(long, env = "GUI", default_value_t = false)]
+    pub gui: bool,
+
     /// Address to bind the HTTP/WebSocket server on.
     #[arg(long, env = "BIND", default_value = "127.0.0.1:8080")]
     pub bind: String,

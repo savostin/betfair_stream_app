@@ -1,6 +1,6 @@
 [package]
 name = "betfair_stream_proxy"
-version = "1.0.1"
+version = "1.0.3"
 edition = "2021"
 
 [dependencies]
@@ -25,7 +25,24 @@ webpki-roots = "0.26"
 # For DNS name parsing for rustls ServerName
 rustls-pki-types = "1"
 
+# Optional GUI (tray icon + Exit menu)
+tray-icon = { version = "0.19", optional = true }
+tao = { version = "0.30", optional = true }
+ico = { version = "0.4", optional = true }
+
+[features]
+default = []
+gui = ["dep:tray-icon", "dep:tao", "dep:ico"]
+
+[target.'cfg(windows)'.build-dependencies]
+winres = "0.1"
+
 [profile.release]
 lto = true
 codegen-units = 1
 strip = "symbols"
+
+[[bin]]
+name = "betfair_stream_proxy_gui"
+path = "src/bin/betfair_stream_proxy_gui.rs"
+required-features = ["gui"]
