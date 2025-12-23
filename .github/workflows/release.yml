@@ -97,9 +97,15 @@ jobs:
             tar -C dist -czf "dist/${{ matrix.bin }}-${{ matrix.target }}.tar.gz" \
               "${{ matrix.bin }}-${{ matrix.target }}${{ matrix.ext }}" \
               "betfair_stream_proxy.app"
+
+            # Avoid uploading the unpacked .app contents as individual artifacts.
+            rm -rf "dist/betfair_stream_proxy.app"
           else
             tar -C dist -czf "dist/${{ matrix.bin }}-${{ matrix.target }}.tar.gz" "${{ matrix.bin }}-${{ matrix.target }}${{ matrix.ext }}"
           fi
+
+          # Avoid uploading the raw binary in addition to the archive.
+          rm -f "dist/${{ matrix.bin }}-${{ matrix.target }}${{ matrix.ext }}"
 
       - name: Package (zip)
         if: matrix.archive == 'zip'
@@ -121,11 +127,16 @@ jobs:
           if (Test-Path $zipPath) { Remove-Item -Force $zipPath }
           Compress-Archive -Path $dst1,$dst2 -DestinationPath $zipPath
 
+          # Avoid uploading the raw .exe files in addition to the archive.
+          Remove-Item -Force $dst1,$dst2
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.name }}
-          path: dist/*
+          path: |
+            dist/*.tar.gz
+            dist/*.zip
 
   publish:
     name: Publish GitHub Release
@@ -142,5 +153,6 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            dist/**
+            dist/**/*.tar.gz
+            dist/**/*.zip
           generate_release_notes: true
