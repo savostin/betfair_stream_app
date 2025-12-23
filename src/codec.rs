@@ -58,7 +58,9 @@ impl Decoder for CrlfTextCodec {
         }
 
         if src.len() > self.max_len {
-            return Err(CodecError("buffer exceeds max length without delimiter".to_string()));
+            return Err(CodecError(
+                "buffer exceeds max length without delimiter".to_string(),
+            ));
         }
 
         Ok(None)

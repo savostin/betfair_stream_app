@@ -13,9 +13,9 @@ use axum::{
 };
 use config::Config;
 use std::sync::Arc;
-use tracing::{info, warn};
-use tower_http::trace::TraceLayer;
 use tokio_util::sync::CancellationToken;
+use tower_http::trace::TraceLayer;
+use tracing::{info, warn};
 
 #[derive(Clone)]
 struct AppState {
@@ -29,15 +29,14 @@ async fn main() {
 
     tracing_subscriber::fmt()
         .with_env_filter(
-            tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| "info".into()),
+            tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| "info".into()),
         )
         .init();
 
     let tls_config = rustls::ClientConfig::builder()
-        .with_root_certificates(std::sync::Arc::new(
-            rustls::RootCertStore::from_iter(webpki_roots::TLS_SERVER_ROOTS.iter().cloned()),
-        ))
+        .with_root_certificates(std::sync::Arc::new(rustls::RootCertStore::from_iter(
+            webpki_roots::TLS_SERVER_ROOTS.iter().cloned(),
+        )))
         .with_no_client_auth();
     let tls = Arc::new(tokio_rustls::TlsConnector::from(Arc::new(tls_config)));
 
@@ -49,7 +48,9 @@ async fn main() {
         .layer(TraceLayer::new_for_http())
         .with_state(state.clone());
 
-    let listener = tokio::net::TcpListener::bind(&state.config.bind).await.unwrap();
+    let listener = tokio::net::TcpListener::bind(&state.config.bind)
+        .await
+        .unwrap();
     info!(bind = %state.config.bind, "listening");
     axum::serve(listener, app)
         .with_graceful_shutdown(shutdown_signal())
@@ -76,7 +77,10 @@ async fn ws_handler(
     })
 }
 
-async fn proxy_session(ws: axum::extract::ws::WebSocket, state: AppState) -> Result<(), error::AppError> {
+async fn proxy_session(
+    ws: axum::extract::ws::WebSocket,
+    state: AppState,
+) -> Result<(), error::AppError> {
     use axum::extract::ws::Message;
     use futures_util::{SinkExt, StreamExt};
     use tokio::sync::mpsc;

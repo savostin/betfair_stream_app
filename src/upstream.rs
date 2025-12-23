@@ -57,7 +57,12 @@ pub async fn connect(cfg: &Config, tls: &TlsConnector) -> Result<Upstream, AppEr
         TcpStream::connect(addr),
     )
     .await
-    .map_err(|_| AppError::Io(std::io::Error::new(std::io::ErrorKind::TimedOut, "upstream connect timeout")))??;
+    .map_err(|_| {
+        AppError::Io(std::io::Error::new(
+            std::io::ErrorKind::TimedOut,
+            "upstream connect timeout",
+        ))
+    })??;
 
     let server_name = ServerName::try_from(cfg.betfair_host.clone())
         .map_err(|_| AppError::Tls("invalid betfair host for SNI".to_string()))?;
@@ -71,5 +76,7 @@ pub async fn connect(cfg: &Config, tls: &TlsConnector) -> Result<Upstream, AppEr
 
     let framed = Framed::new(tls_stream, CrlfTextCodec::new(cfg.upstream_max_frame_bytes));
 
-    Ok(Upstream { framed: Some(framed) })
+    Ok(Upstream {
+        framed: Some(framed),
+    })
 }
