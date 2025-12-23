@@ -1,6 +1,6 @@
 [package]
 name = "betfair_stream_proxy"
-version = "1.0.3"
+version = "1.0.4"
 edition = "2021"
 
 [dependencies]
@@ -29,10 +29,11 @@ rustls-pki-types = "1"
 tray-icon = { version = "0.19", optional = true }
 tao = { version = "0.30", optional = true }
 ico = { version = "0.4", optional = true }
+rfd = { version = "0.15", optional = true, default-features = true }
 
 [features]
 default = []
-gui = ["dep:tray-icon", "dep:tao", "dep:ico"]
+gui = ["dep:tray-icon", "dep:tao", "dep:ico", "dep:rfd"]
 
 [target.'cfg(windows)'.build-dependencies]
 winres = "0.1"

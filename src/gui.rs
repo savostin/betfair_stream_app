@@ -47,6 +47,8 @@ pub fn run_gui(
     let mut event_loop = EventLoop::new();
     let menu_rx = MenuEvent::receiver();
 
+    let mut shown_fatal_error_dialog = false;
+
     // On macOS, the UI event loop must be on the main thread.
     // run_return lets us exit cleanly when the Exit menu item is clicked.
     let mut shutdown_tx = Some(shutdown_tx);
@@ -58,6 +60,24 @@ pub fn run_gui(
         while let Ok(err) = server_err_rx.try_recv() {
             let tooltip = format!("{base_tooltip} (ERROR: {err})");
             let _ = tray.set_tooltip(Some(tooltip));
+
+            // In GUI mode, server failures can be invisible (especially on Windows where
+            // the GUI binary has no console). Treat any server error as fatal: show a dialog once
+            // and exit.
+            if !shown_fatal_error_dialog {
+                shown_fatal_error_dialog = true;
+                let _ = rfd::MessageDialog::new()
+                    .set_title(&app_name)
+                    .set_description(format!("Server error:\n\n{err}"))
+                    .set_level(rfd::MessageLevel::Error)
+                    .show();
+
+                if let Some(tx) = shutdown_tx.take() {
+                    let _ = tx.send(());
+                }
+                *control_flow = ControlFlow::Exit;
+                break;
+            }
         }
 
         while let Ok(menu_event) = menu_rx.try_recv() {
