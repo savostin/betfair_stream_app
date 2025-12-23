@@ -1,4 +1,8 @@
-# betfair_stream_proxy
+# Betfair Stream API to Websocket Proxy
+
+![VIBE CODING](https://img.shields.io/badge/warning-VIBE_CODING-orange?logo=claude)  ![GitHub Release](https://img.shields.io/github/v/release/savostin/betfair_stream_proxy.rs)
+
+
 
 A small Rust service that accepts browser WebSocket connections and proxies messages to/from the Betfair Exchange Stream API.
 
