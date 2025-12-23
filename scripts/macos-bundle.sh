@@ -18,7 +18,7 @@ BUNDLE_ID="${BUNDLE_ID:-com.savostin.betfair-stream-proxy}"
 
 # Best-effort version inference (works when run from repo root).
 if [[ -z "${VERSION:-}" ]]; then
-  VERSION="$(cargo pkgid 2>/dev/null | sed -E 's/.*#([0-9]+\.[0-9]+\.[0-9]+).*/\1/' || true)"
+  VERSION="$(cargo pkgid 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n1 || true)"
 fi
 VERSION="${VERSION:-0.0.0}"
 

@@ -37,11 +37,12 @@ if [[ -n "$(git status --porcelain)" ]]; then
   exit 1
 fi
 
-VERSION="$(cargo pkgid | sed -E 's/.*#([0-9]+\.[0-9]+\.[0-9]+).*/\1/')"
+VERSION="$(cargo pkgid | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n1 || true)"
 if [[ -z "${VERSION}" ]]; then
   echo "ERROR: failed to determine version from cargo" >&2
   exit 1
 fi
+
 
 TAG="v${VERSION}"
 
