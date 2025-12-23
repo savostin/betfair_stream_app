@@ -49,11 +49,11 @@ cargo build --release
 ## CI/CD
 
 - CI runs on every Pull Request and on pushes to `main`.
-- Release artifacts are built and published when you push a tag matching `v*` (for example `v0.1.0`).
+- Release artifacts are built and published when you push a tag matching `v*` (for example `v1.0.1`).
 
 Suggested release flow:
 
 ```bash
-git tag v0.1.0
-git push origin v0.1.0
+git tag v1.0.1
+git push origin v1.0.1
 ```
