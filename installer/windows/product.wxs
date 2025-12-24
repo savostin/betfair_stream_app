@@ -71,8 +71,6 @@
 
     <!-- Service install/remove implemented as custom actions so we can keep a single installed exe
          and still make "install service" optional. -->
-    <Binary Id="WixCA" SourceFile="$(var.WixCAPath)" />
-
     <CustomAction Id="InstallServiceExec" BinaryKey="WixCA" DllEntry="WixQuietExec" Execute="deferred" Return="check" Impersonate="no" />
     <CustomAction Id="SetInstallServiceExecCmd" Property="InstallServiceExec"
             Value="&quot;[SystemFolder]cmd.exe&quot; /c &quot;&quot;[SystemFolder]sc.exe&quot; create BetfairStreamProxy binPath= \&quot;\&quot;[INSTALLFOLDER]betfair_stream_proxy.exe\&quot; --service\&quot; start= auto DisplayName= \&quot;Betfair Stream Proxy\&quot; &amp;&amp; &quot;[SystemFolder]sc.exe&quot; description BetfairStreamProxy \&quot;Betfair Stream Proxy (runs the console server in the background)\&quot; &amp;&amp; &quot;[SystemFolder]sc.exe&quot; start BetfairStreamProxy&quot;" />

@@ -147,11 +147,8 @@ jobs:
           $wixobj = Join-Path -Path 'dist' -ChildPath 'installer.wixobj'
           $msi = Join-Path -Path 'dist' -ChildPath "${{ matrix.bin }}-${{ matrix.target }}.msi"
 
-          $wixBin = Split-Path -Parent (Get-Command candle.exe).Source
-          $wixCAPath = Join-Path -Path $wixBin -ChildPath 'WixCA.dll'
-
           # Build MSI.
-          & candle.exe -nologo "-dProductVersion=$productVersion" "-dStagingDir=$staging" "-dWixCAPath=$wixCAPath" -out $wixobj $wxs
+          & candle.exe -nologo "-dProductVersion=$productVersion" "-dStagingDir=$staging" -out $wixobj $wxs
           light.exe -nologo -ext WixUIExtension -ext WixUtilExtension -out $msi $wixobj
 
           # Clean staging outputs.
