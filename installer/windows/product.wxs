@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+  <Product
+    Id="*"
+    Name="Betfair Stream Proxy"
+    Manufacturer="Savostin"
+    Language="1033"
+    Version="$(var.Version)"
+    UpgradeCode="A8F6B5B6-9B51-4E7E-9F7A-9E1B0C7A6A57">
+
+    <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine" />
+
+    <MajorUpgrade
+      Schedule="afterInstallInitialize"
+      DowngradeErrorMessage="A newer version of Betfair Stream Proxy is already installed." />
+
+    <MediaTemplate />
+
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+    <Property Id="INSTALL_SERVICE" Value="0" />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="Betfair Stream Proxy">
+          <Component Id="cmpConsoleExe" Guid="*">
+            <File Id="filConsoleExe" Source="$(var.StagingDir)\\betfair_stream_proxy.exe" KeyPath="yes" />
+          </Component>
+
+          <Component Id="cmpGuiExe" Guid="*">
+            <File Id="filGuiExe" Source="$(var.StagingDir)\\betfair_stream_proxy_gui.exe" KeyPath="yes" />
+          </Component>
+        </Directory>
+      </Directory>
+    </Directory>
+
+    <Feature Id="ProductFeature" Title="Betfair Stream Proxy" Level="1">
+      <Feature Id="featConsole" Title="Console executable" Level="1">
+        <ComponentRef Id="cmpConsoleExe" />
+      </Feature>
+
+      <Feature Id="featGui" Title="GUI (tray) executable" Level="1">
+        <ComponentRef Id="cmpGuiExe" />
+      </Feature>
+    </Feature>
+
+    <UIRef Id="WixUI_FeatureTree" />
+    <UIRef Id="WixUI_ErrorProgressText" />
+
+    <!-- Custom "Install as service" page after the feature selection page (CustomizeDlg). -->
+    <UI>
+      <Dialog Id="ServiceDlg" Width="370" Height="270" Title="[ProductName] Setup">
+        <Control Id="Title" Type="Text" X="15" Y="6" Width="340" Height="15" Transparent="yes" NoPrefix="yes" Text="Install as Windows service" />
+        <Control Id="Description" Type="Text" X="15" Y="30" Width="340" Height="40" Transparent="yes" NoPrefix="yes" Text="Optionally install the console server as a Windows service so it can run in the background and start automatically." />
+
+        <Control Id="InstallServiceCheckbox" Type="CheckBox" X="20" Y="85" Width="330" Height="18"
+                 Property="INSTALL_SERVICE" CheckBoxValue="1" Text="Install console server as a Windows service" />
+
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="Back">
+          <Publish Event="NewDialog" Value="CustomizeDlg">1</Publish>
+        </Control>
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="Next">
+          <Publish Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+        </Control>
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="Cancel">
+          <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+        </Control>
+      </Dialog>
+
+      <Publish Dialog="CustomizeDlg" Control="Next" Event="NewDialog" Value="ServiceDlg" Order="100">1</Publish>
+    </UI>
+
+    <!-- Service install/remove implemented as custom actions so we can keep a single installed exe
+         and still make "install service" optional. -->
+    <Binary Id="WixCA" SourceFile="$(var.WixCAPath)" />
+
+    <CustomAction Id="InstallServiceExec" BinaryKey="WixCA" DllEntry="WixQuietExec" Execute="deferred" Return="check" Impersonate="no" />
+    <CustomAction Id="SetInstallServiceExecCmd" Property="InstallServiceExec"
+            Value="&quot;[SystemFolder]cmd.exe&quot; /c &quot;&quot;[SystemFolder]sc.exe&quot; create BetfairStreamProxy binPath= \&quot;\&quot;[INSTALLFOLDER]betfair_stream_proxy.exe\&quot; --service\&quot; start= auto DisplayName= \&quot;Betfair Stream Proxy\&quot; &amp;&amp; &quot;[SystemFolder]sc.exe&quot; description BetfairStreamProxy \&quot;Betfair Stream Proxy (runs the console server in the background)\&quot; &amp;&amp; &quot;[SystemFolder]sc.exe&quot; start BetfairStreamProxy&quot;" />
+
+    <CustomAction Id="RemoveServiceExec" BinaryKey="WixCA" DllEntry="WixQuietExec" Execute="deferred" Return="ignore" Impersonate="no" />
+    <CustomAction Id="SetRemoveServiceExecCmd" Property="RemoveServiceExec"
+            Value="&quot;[SystemFolder]cmd.exe&quot; /c &quot;&quot;[SystemFolder]sc.exe&quot; stop BetfairStreamProxy &gt;nul 2&gt;&amp;1 &amp; &quot;[SystemFolder]sc.exe&quot; delete BetfairStreamProxy &gt;nul 2&gt;&amp;1&quot;" />
+
+    <InstallExecuteSequence>
+      <!-- Only install service on first install when user checked the box AND console feature is selected. -->
+      <Custom Action="SetInstallServiceExecCmd" After="InstallFiles">NOT Installed AND INSTALL_SERVICE=1 AND (&amp;featConsole=3)</Custom>
+      <Custom Action="InstallServiceExec" After="SetInstallServiceExecCmd">NOT Installed AND INSTALL_SERVICE=1 AND (&amp;featConsole=3)</Custom>
+
+      <!-- Always attempt to remove the service during full uninstall (ignore failures). -->
+      <Custom Action="SetRemoveServiceExecCmd" Before="RemoveFiles">REMOVE="ALL"</Custom>
+      <Custom Action="RemoveServiceExec" After="SetRemoveServiceExecCmd">REMOVE="ALL"</Custom>
+    </InstallExecuteSequence>
+  </Product>
+</Wix>

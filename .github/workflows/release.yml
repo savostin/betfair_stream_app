@@ -29,7 +29,7 @@ jobs:
             target: x86_64-pc-windows-msvc
             bin: betfair_stream_proxy
             ext: .exe
-            archive: zip
+            archive: msi
 
           # Build both mac architectures using the corresponding runner architecture
           - name: macos-aarch64
@@ -37,14 +37,14 @@ jobs:
             target: aarch64-apple-darwin
             bin: betfair_stream_proxy
             ext: ""
-            archive: tar.gz
+            archive: dmg
 
           - name: macos-x86_64
             os: macos-15-intel
             target: x86_64-apple-darwin
             bin: betfair_stream_proxy
             ext: ""
-            archive: tar.gz
+            archive: dmg
 
     steps:
       - uses: actions/checkout@v4
@@ -107,28 +107,48 @@ jobs:
           # Avoid uploading the raw binary in addition to the archive.
           rm -f "dist/${{ matrix.bin }}-${{ matrix.target }}${{ matrix.ext }}"
 
-      - name: Package (zip)
-        if: matrix.archive == 'zip'
+      - name: Package (dmg)
+        if: matrix.archive == 'dmg'
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          VERSION="${GITHUB_REF_NAME#v}"
+          DMG_NAME="${{ matrix.bin }}-${{ matrix.target }}-${VERSION}.dmg"
+          scripts/macos-dmg.sh "dist/betfair_stream_proxy.app" "dist/${DMG_NAME}"
+
+      - name: Package (msi)
+        if: matrix.archive == 'msi'
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
+
           New-Item -ItemType Directory -Force -Path dist | Out-Null
-          $src1 = Join-Path -Path "target" -ChildPath "${{ matrix.target }}/release/${{ matrix.bin }}${{ matrix.ext }}"
-          $dstName1 = "${{ matrix.bin }}-${{ matrix.target }}${{ matrix.ext }}"
-          $dst1 = Join-Path -Path "dist" -ChildPath $dstName1
-          Copy-Item -Force -Path $src1 -Destination $dst1
+          $staging = Join-Path -Path $pwd -ChildPath 'dist\\msi-staging'
+          New-Item -ItemType Directory -Force -Path $staging | Out-Null
 
-          # Include the GUI executable on Windows.
-          $src2 = Join-Path -Path "target" -ChildPath "${{ matrix.target }}/release/${{ matrix.bin }}_gui${{ matrix.ext }}"
-          $dstName2 = "${{ matrix.bin }}_gui-${{ matrix.target }}${{ matrix.ext }}"
-          $dst2 = Join-Path -Path "dist" -ChildPath $dstName2
-          Copy-Item -Force -Path $src2 -Destination $dst2
-          $zipPath = Join-Path -Path "dist" -ChildPath "${{ matrix.bin }}-${{ matrix.target }}.zip"
-          if (Test-Path $zipPath) { Remove-Item -Force $zipPath }
-          Compress-Archive -Path $dst1,$dst2 -DestinationPath $zipPath
+          # Stage the two Rust executables.
+          Copy-Item -Force -Path (Join-Path -Path 'target' -ChildPath "${{ matrix.target }}\\release\\${{ matrix.bin }}.exe") -Destination (Join-Path $staging 'betfair_stream_proxy.exe')
+          Copy-Item -Force -Path (Join-Path -Path 'target' -ChildPath "${{ matrix.target }}\\release\\${{ matrix.bin }}_gui.exe") -Destination (Join-Path $staging 'betfair_stream_proxy_gui.exe')
 
-          # Avoid uploading the raw .exe files in addition to the archive.
-          Remove-Item -Force $dst1,$dst2
+          # Install WiX Toolset (v3) for MSI packaging.
+          choco install wixtoolset -y --no-progress
+
+          $version = "${{ github.ref_name }}".Replace('v','')
+          $wxs = Join-Path -Path 'installer' -ChildPath 'windows\\product.wxs'
+          $wixobj = Join-Path -Path 'dist' -ChildPath 'installer.wixobj'
+          $msi = Join-Path -Path 'dist' -ChildPath "${{ matrix.bin }}-${{ matrix.target }}.msi"
+
+          $wixBin = Split-Path -Parent (Get-Command candle.exe).Source
+          $wixCAPath = Join-Path -Path $wixBin -ChildPath 'WixCA.dll'
+
+          # Build MSI.
+          candle.exe -nologo -dVersion=$version -dStagingDir=$staging -dWixCAPath=$wixCAPath -out $wixobj $wxs
+          light.exe -nologo -ext WixUIExtension -ext WixUtilExtension -out $msi $wixobj
+
+          # Clean staging outputs.
+          Remove-Item -Recurse -Force $staging
+          Remove-Item -Force $wixobj
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -137,6 +157,8 @@ jobs:
           path: |
             dist/*.tar.gz
             dist/*.zip
+            dist/*.msi
+            dist/*.dmg
 
   publish:
     name: Publish GitHub Release
@@ -155,4 +177,6 @@ jobs:
           files: |
             dist/**/*.tar.gz
             dist/**/*.zip
+            dist/**/*.msi
+            dist/**/*.dmg
           generate_release_notes: true

@@ -45,6 +45,17 @@ pub fn run_from_cli(force_gui: bool) {
         .with_no_client_auth();
     let tls = Arc::new(tokio_rustls::TlsConnector::from(Arc::new(tls_config)));
 
+    // Windows Service mode: run under Service Control Manager.
+    #[cfg(windows)]
+    {
+        if config.service {
+            if let Err(e) = crate::windows_service::run_as_service(config, tls) {
+                eprintln!("service error: {e}");
+            }
+            return;
+        }
+    }
+
     if should_use_gui {
         #[cfg(feature = "gui")]
         {
@@ -108,7 +119,7 @@ fn run_with_gui(config: Arc<Config>, tls: Arc<tokio_rustls::TlsConnector>) {
     let _ = server_thread.join();
 }
 
-async fn run_server(
+pub(crate) async fn run_server(
     config: Arc<Config>,
     tls: Arc<tokio_rustls::TlsConnector>,
     gui_shutdown: Option<tokio::sync::oneshot::Receiver<()>>,

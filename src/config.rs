@@ -54,6 +54,13 @@ pub struct Config {
     /// If exceeded, the proxy disconnects the client as "too slow".
     #[arg(long, env = "WS_SEND_TIMEOUT_MS", default_value_t = 5_000)]
     pub ws_send_timeout_ms: u64,
+
+    /// Run as a Windows Service (used by SCM).
+    ///
+    /// This is intended to be launched by Windows Service Control Manager, not by users.
+    #[cfg(windows)]
+    #[arg(long, env = "SERVICE", default_value_t = false, hide = true)]
+    pub service: bool,
 }
 
 impl Config {

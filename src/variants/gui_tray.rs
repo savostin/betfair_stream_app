@@ -1,4 +1,5 @@
 use std::io::Cursor;
+
 use tao::platform::run_return::EventLoopExtRunReturn;
 use tao::{
     event::{Event, StartCause},
@@ -20,7 +21,7 @@ pub fn run_gui(
 
     // Load the tray icon from a real asset.
     // We store it as an .ico and decode it to RGBA for cross-platform use.
-    let icon_bytes: &[u8] = include_bytes!("../assets/icon.ico");
+    let icon_bytes: &[u8] = include_bytes!("../../assets/icon.ico");
     let icon_dir = ico::IconDir::read(Cursor::new(icon_bytes))?;
     let best_entry = icon_dir
         .entries()
