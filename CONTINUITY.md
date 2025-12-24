@@ -17,11 +17,14 @@
 ## State:
 - Done:
   - DMG packaging script and workflow wiring.
+  - Linux release archive naming includes version from tag.
   - Added Cargo.lock freshness checks in CI/release and `scripts/release.sh`.
   - WiX version passing fixes (ProductVersion variable passed from workflow).
   - Centralized app/product naming in `Cargo.toml` `[package.metadata.app]` and wired scripts/workflows to consume it via `scripts/app-config.sh` (portable on macOS default awk).
 - Now:
   - UNCONFIRMED: ensure the next tag/release contains these changes.
+  - Investigate tiny Windows MSI size: ensure CAB is embedded (WiX `MediaTemplate EmbedCab="yes"`).
+  - Safety net: upload any WiX-generated `dist/*.cab` alongside the MSI.
 - Next:
   - Tag and publish a release built from the commit that contains the metadata + workflow updates.
 

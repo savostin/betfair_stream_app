@@ -109,20 +109,21 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p dist
-          cp "target/${{ matrix.target }}/release/${{ matrix.bin }}${{ matrix.ext }}" "dist/${{ matrix.bin }}-${{ matrix.target }}${{ matrix.ext }}"
+          VERSION="${GITHUB_REF_NAME#v}"
+          cp "target/${{ matrix.target }}/release/${{ matrix.bin }}${{ matrix.ext }}" "dist/${{ matrix.bin }}-${{ matrix.target }}-${VERSION}${{ matrix.ext }}"
           if [[ "${{ runner.os }}" == "macOS" ]]; then
-            tar -C dist -czf "dist/${{ matrix.bin }}-${{ matrix.target }}.tar.gz" \
-              "${{ matrix.bin }}-${{ matrix.target }}${{ matrix.ext }}" \
+            tar -C dist -czf "dist/${{ matrix.bin }}-${{ matrix.target }}-${VERSION}.tar.gz" \
+              "${{ matrix.bin }}-${{ matrix.target }}-${VERSION}${{ matrix.ext }}" \
               "betfair_stream_proxy.app"
 
             # Avoid uploading the unpacked .app contents as individual artifacts.
             rm -rf "dist/betfair_stream_proxy.app"
           else
-            tar -C dist -czf "dist/${{ matrix.bin }}-${{ matrix.target }}.tar.gz" "${{ matrix.bin }}-${{ matrix.target }}${{ matrix.ext }}"
+            tar -C dist -czf "dist/${{ matrix.bin }}-${{ matrix.target }}-${VERSION}.tar.gz" "${{ matrix.bin }}-${{ matrix.target }}-${VERSION}${{ matrix.ext }}"
           fi
 
           # Avoid uploading the raw binary in addition to the archive.
-          rm -f "dist/${{ matrix.bin }}-${{ matrix.target }}${{ matrix.ext }}"
+          rm -f "dist/${{ matrix.bin }}-${{ matrix.target }}-${VERSION}${{ matrix.ext }}"
 
       - name: Package (dmg)
         if: matrix.archive == 'dmg'
@@ -174,6 +175,7 @@ jobs:
             dist/*.tar.gz
             dist/*.zip
             dist/*.msi
+            dist/*.cab
             dist/*.dmg
 
   publish:
