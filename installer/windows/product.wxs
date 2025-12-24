@@ -2,7 +2,7 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
   <Product
     Id="*"
-    Name="Betfair Stream Proxy"
+    Name="$(var.ProductName)"
     Manufacturer="Savostin"
     Language="1033"
     Version="$(var.ProductVersion)"
@@ -21,7 +21,7 @@
 
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder">
-        <Directory Id="INSTALLFOLDER" Name="Betfair Stream Proxy">
+        <Directory Id="INSTALLFOLDER" Name="$(var.ProductName)">
           <Component Id="cmpConsoleExe" Guid="*">
             <File Id="filConsoleExe" Source="$(var.StagingDir)\\betfair_stream_proxy.exe" KeyPath="yes" />
           </Component>
@@ -33,7 +33,7 @@
       </Directory>
     </Directory>
 
-    <Feature Id="ProductFeature" Title="Betfair Stream Proxy" Level="1">
+    <Feature Id="ProductFeature" Title="$(var.ProductName)" Level="1">
       <Feature Id="featConsole" Title="Console executable" Level="1">
         <ComponentRef Id="cmpConsoleExe" />
       </Feature>
@@ -73,7 +73,7 @@
          and still make "install service" optional. -->
     <CustomAction Id="InstallServiceExec" BinaryKey="WixCA" DllEntry="WixQuietExec" Execute="deferred" Return="check" Impersonate="no" />
     <CustomAction Id="SetInstallServiceExecCmd" Property="InstallServiceExec"
-            Value="&quot;[SystemFolder]cmd.exe&quot; /c &quot;&quot;[SystemFolder]sc.exe&quot; create BetfairStreamProxy binPath= \&quot;\&quot;[INSTALLFOLDER]betfair_stream_proxy.exe\&quot; --service\&quot; start= auto DisplayName= \&quot;Betfair Stream Proxy\&quot; &amp;&amp; &quot;[SystemFolder]sc.exe&quot; description BetfairStreamProxy \&quot;Betfair Stream Proxy (runs the console server in the background)\&quot; &amp;&amp; &quot;[SystemFolder]sc.exe&quot; start BetfairStreamProxy&quot;" />
+          Value="&quot;[SystemFolder]cmd.exe&quot; /c &quot;&quot;[SystemFolder]sc.exe&quot; create BetfairStreamProxy binPath= \&quot;\&quot;[INSTALLFOLDER]betfair_stream_proxy.exe\&quot; --service\&quot; start= auto DisplayName= \&quot;[ProductName]\&quot; &amp;&amp; &quot;[SystemFolder]sc.exe&quot; description BetfairStreamProxy \&quot;[ProductName] (runs the console server in the background)\&quot; &amp;&amp; &quot;[SystemFolder]sc.exe&quot; start BetfairStreamProxy&quot;" />
 
     <CustomAction Id="RemoveServiceExec" BinaryKey="WixCA" DllEntry="WixQuietExec" Execute="deferred" Return="ignore" Impersonate="no" />
     <CustomAction Id="SetRemoveServiceExecCmd" Property="RemoveServiceExec"

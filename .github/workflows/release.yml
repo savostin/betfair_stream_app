@@ -75,6 +75,16 @@ jobs:
           cargo generate-lockfile
           git diff --exit-code -- Cargo.lock
 
+      - name: Load app metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          source scripts/app-config.sh
+          echo "APP_NAME=${APP_DISPLAY_NAME}" >> "$GITHUB_ENV"
+          echo "BUNDLE_ID=${APP_BUNDLE_ID}" >> "$GITHUB_ENV"
+          echo "DMG_VOLUME_NAME=${APP_DMG_VOLUME_NAME}" >> "$GITHUB_ENV"
+          echo "WINDOWS_PRODUCT_NAME=${APP_WINDOWS_PRODUCT_NAME}" >> "$GITHUB_ENV"
+
       - name: Install Linux GUI deps
         if: runner.os == 'Linux'
         run: |
@@ -90,7 +100,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p dist
-          VERSION="${GITHUB_REF_NAME#v}" APP_BUNDLE_NAME="betfair_stream_proxy" \
+          VERSION="${GITHUB_REF_NAME#v}" APP_BUNDLE_NAME="${APP_NAME}" BUNDLE_ID="${BUNDLE_ID}" \
             scripts/macos-bundle.sh "target/${{ matrix.target }}/release/${{ matrix.bin }}" dist
 
       - name: Package (tar.gz)
@@ -122,7 +132,7 @@ jobs:
           mkdir -p dist
           VERSION="${GITHUB_REF_NAME#v}"
           DMG_NAME="${{ matrix.bin }}-${{ matrix.target }}-${VERSION}.dmg"
-          scripts/macos-dmg.sh "dist/betfair_stream_proxy.app" "dist/${DMG_NAME}"
+          scripts/macos-dmg.sh "dist/${APP_NAME}.app" "dist/${DMG_NAME}"
 
       - name: Package (msi)
         if: matrix.archive == 'msi'
@@ -143,12 +153,13 @@ jobs:
 
           $version = "${{ github.ref_name }}".Replace('v','')
           $productVersion = "$version.0"
+          $productName = "${{ env.WINDOWS_PRODUCT_NAME }}"
           $wxs = Join-Path -Path 'installer' -ChildPath 'windows\\product.wxs'
           $wixobj = Join-Path -Path 'dist' -ChildPath 'installer.wixobj'
           $msi = Join-Path -Path 'dist' -ChildPath "${{ matrix.bin }}-${{ matrix.target }}.msi"
 
           # Build MSI.
-          & candle.exe -nologo "-dProductVersion=$productVersion" "-dStagingDir=$staging" -out $wixobj $wxs
+          & candle.exe -nologo "-dProductVersion=$productVersion" "-dProductName=$productName" "-dStagingDir=$staging" -out $wixobj $wxs
           light.exe -nologo -ext WixUIExtension -ext WixUtilExtension -out $msi $wixobj
 
           # Clean staging outputs.

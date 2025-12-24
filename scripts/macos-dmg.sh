@@ -18,7 +18,10 @@ if [[ ! -d "${APP_PATH}" || "${APP_PATH}" != *.app ]]; then
   exit 2
 fi
 
-VOL_NAME="${DMG_VOLUME_NAME:-Betfair Stream API Proxy}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/app-config.sh"
+
+VOL_NAME="${DMG_VOLUME_NAME:-${APP_DMG_VOLUME_NAME}}"
 
 STAGE_DIR="$(mktemp -d)"
 cleanup() {

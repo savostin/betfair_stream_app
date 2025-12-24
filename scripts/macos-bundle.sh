@@ -6,15 +6,20 @@ set -euo pipefail
 #   scripts/macos-bundle.sh <path-to-built-binary> <output-dir>
 #
 # Environment overrides:
-#   APP_BUNDLE_NAME   (default: betfair_stream_proxy)
+#   APP_BUNDLE_NAME   (default: Betfair Stream API Proxy)
 #   BUNDLE_ID         (default: com.savostin.betfair-stream-proxy)
 #   VERSION           (default: inferred from cargo)
 
 BIN_PATH="${1:?expected path to built binary}"
 OUT_DIR="${2:-dist}"
 
-APP_BUNDLE_NAME="${APP_BUNDLE_NAME:-Betfair Stream API Proxy}"
-BUNDLE_ID="${BUNDLE_ID:-com.savostin.betfair-stream-proxy}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Load display name / bundle id defaults from Cargo.toml metadata.
+# Environment overrides still take precedence.
+source "${SCRIPT_DIR}/app-config.sh"
+
+APP_BUNDLE_NAME="${APP_BUNDLE_NAME:-${APP_DISPLAY_NAME}}"
+BUNDLE_ID="${BUNDLE_ID:-${APP_BUNDLE_ID}}"
 
 # Best-effort version inference (works when run from repo root).
 if [[ -z "${VERSION:-}" ]]; then

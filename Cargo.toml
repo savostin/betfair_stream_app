@@ -1,7 +1,15 @@
 [package]
 name = "betfair_stream_proxy"
-version = "1.0.9"
+version = "1.0.10"
 edition = "2021"
+
+[package.metadata.app]
+# Human-friendly name (can contain spaces) used for macOS .app, DMG volume name,
+# and installer display strings. Cargo package name must remain an identifier.
+display_name = "Betfair Stream API Proxy"
+bundle_id = "com.savostin.betfair-stream-proxy"
+dmg_volume_name = "Betfair Stream API Proxy"
+windows_product_name = "Betfair Stream API Proxy"
 
 [dependencies]
 axum = { version = "0.7", features = ["ws", "macros"] }
