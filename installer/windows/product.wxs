@@ -5,7 +5,7 @@
     Name="Betfair Stream Proxy"
     Manufacturer="Savostin"
     Language="1033"
-    Version="$(var.Version).0"
+    Version="$(var.ProductVersion)"
     UpgradeCode="A8F6B5B6-9B51-4E7E-9F7A-9E1B0C7A6A57">
 
     <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine" />
