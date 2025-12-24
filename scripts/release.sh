@@ -32,6 +32,16 @@ if ! git rev-parse --git-dir >/dev/null 2>&1; then
   exit 1
 fi
 
+# Ensure Cargo.lock matches Cargo.toml before tagging.
+# This prevents CI/release failures due to --locked refusing to update the lockfile.
+if command -v cargo >/dev/null 2>&1; then
+  cargo generate-lockfile
+  if ! git diff --quiet -- Cargo.lock; then
+    echo "ERROR: Cargo.lock was updated. Please commit Cargo.lock changes and re-run." >&2
+    exit 1
+  fi
+fi
+
 if [[ -n "$(git status --porcelain)" ]]; then
   echo "ERROR: working tree is dirty; commit or stash changes first" >&2
   exit 1

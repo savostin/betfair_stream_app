@@ -28,6 +28,13 @@ jobs:
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
 
+      - name: Ensure Cargo.lock is up to date
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo generate-lockfile
+          git diff --exit-code -- Cargo.lock
+
       - name: Format
         run: cargo fmt --all -- --check
 
