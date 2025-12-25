@@ -68,6 +68,7 @@
   - Committed the Tauri-only root-layout migration + naming updates (commit: e38a0ff).
   - Switched Tauri bundling icon paths to `assets/icon.*` and removed the unused `icons/` folder (commit: f118416).
   - Removed legacy `assets/index.html` (temporary UI from the old app).
+  - Added a safety guard in `scripts/release.sh` to refuse releasing from non-`main` branches (and from detached HEAD).
 - Confirmed Betfair RPC `ANGX-0007` root cause was a stale/dummy AppKey in the environment; runtime `.env` loading and precedence are now robust (crate-root `.env`, `.env` overrides sticky exported values).
 - Removed Tauri `beforeBuildCommand`/`beforeDevCommand` hooks and moved UI production build into `build.rs` for release builds (opt-out via `TAURI_SKIP_UI_BUILD=1`).
 - Now:
