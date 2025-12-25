@@ -1,6 +1,6 @@
 # BetFair Stream API App (Tauri)
 
-![GitHub Release](https://img.shields.io/github/v/release/savostin/betfair_stream_app.rs)
+![VIBE CODING](https://img.shields.io/badge/warning-VIBE_CODING-orange?logo=claude)  ![GitHub Release](https://img.shields.io/github/v/release/savostin/betfair_stream_app)
 
 Cross-platform **Tauri v2** desktop app that connects to Betfair Exchange APIs:
 
