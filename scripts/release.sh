@@ -38,11 +38,6 @@ if [[ "${BRANCH}" == "HEAD" ]]; then
   exit 1
 fi
 
-if [[ "${BRANCH}" != "main" ]]; then
-  echo "ERROR: refusing to release from non-main branch: ${BRANCH}" >&2
-  echo "       Switch to 'main' (and ensure it's up to date) before tagging a release." >&2
-  exit 1
-fi
 
 # Ensure Cargo.lock matches Cargo.toml before tagging.
 # This prevents CI/release failures due to --locked refusing to update the lockfile.
