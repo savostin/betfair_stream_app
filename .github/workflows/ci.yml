@@ -71,4 +71,6 @@ jobs:
         run: cargo test --all
 
       - name: Build (release)
+        env:
+          TAURI_SKIP_UI_BUILD: "1"
         run: cargo build --release --locked

@@ -67,14 +67,18 @@
   - Updated remaining markdown/docs naming to "BetFair Stream API App" and removed stale references.
   - Committed the Tauri-only root-layout migration + naming updates (commit: e38a0ff).
   - Switched Tauri bundling icon paths to `assets/icon.*` and removed the unused `icons/` folder (commit: f118416).
+- Confirmed Betfair RPC `ANGX-0007` root cause was a stale/dummy AppKey in the environment; runtime `.env` loading and precedence are now robust (crate-root `.env`, `.env` overrides sticky exported values).
+- Removed Tauri `beforeBuildCommand`/`beforeDevCommand` hooks and moved UI production build into `build.rs` for release builds (opt-out via `TAURI_SKIP_UI_BUILD=1`).
 - Now:
-  - Validate end-to-end in Tauri dev: login → markets → select market → live stream updates.
-  - Investigate/fix Betfair JSON-RPC error after login: `ANGX-0007` (HTTP 200, code -32099). Mitigation in progress: send single JSON-RPC object instead of 1-element batch array.
-  - Ensure `BETFAIR_APP_KEY` loads from `.env` during local `cargo run`/`cargo build`: `main.rs` loads `.env` from crate root and forces BETFAIR_APP_KEY from it (prevents sticky exported dummy values); `build.rs` reads `.env` from crate root when env var isn't set.
-  - UI build is executed from `build.rs` for release builds; Tauri `beforeBuildCommand`/`beforeDevCommand` hooks are no longer used.
-  - UNCONFIRMED: verify release workflow artifact collection paths are correct on all OS runners (macOS/Windows/Linux).
+  - Audit Windows/Linux CI + release workflows after the Tauri-only root-layout switch (deps, artifact collection, redundant UI builds).
+  - Validate release workflow artifact collection paths and shell compatibility on all OS runners (macOS/Windows/Linux).
+  - Workflow tweaks (committed):
+    - CI skips `build.rs` UI build during `cargo build --release` via `TAURI_SKIP_UI_BUILD=1`.
+    - Release fails fast if `BETFAIR_APP_KEY` secret is missing/empty (prevents shipping bundles without embedded AppKey).
+  - Local validation: `TAURI_SKIP_UI_BUILD=1 cargo build --release --locked` succeeds on macOS.
 - Next:
-  - Tag and publish a release built from the commit that contains the root-layout + CI/workflow updates.
+  - Make any minimal workflow fixes needed for Windows/Linux bundling.
+  - Commit the CI/release workflow adjustments (if uncommitted), then tag and publish a release.
 
 ## Open questions (UNCONFIRMED if needed):
 - UNCONFIRMED: If login still fails, what exact response body/content-type does Betfair Identity return in your locale/account?

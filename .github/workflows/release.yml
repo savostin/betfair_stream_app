@@ -111,6 +111,10 @@ jobs:
           BETFAIR_APP_KEY: ${{ secrets.BETFAIR_APP_KEY }}
         run: |
           set -euo pipefail
+          if [[ -z "${BETFAIR_APP_KEY:-}" ]]; then
+            echo "ERROR: BETFAIR_APP_KEY secret is missing/empty; release bundles must embed the AppKey." >&2
+            exit 1
+          fi
           VERSION="${GITHUB_REF_NAME#v}"
           # Keep artifacts contained under target/ for predictable paths.
           export CARGO_TARGET_DIR="target"
