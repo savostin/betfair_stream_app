@@ -21,12 +21,15 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 thiserror = "2"
 clap = { version = "4", features = ["derive", "env"] }
-tower-http = { version = "0.6", features = ["trace"] }
+tower = "0.5"
+tower-http = { version = "0.6", features = ["trace", "fs"] }
+
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "http2", "json"] }
 
 bytes = "1"
 tokio-util = { version = "0.7", features = ["codec", "rt"] }
 
-rustls = { version = "0.23", default-features = false, features = ["std"] }
+rustls = { version = "0.23", default-features = false, features = ["std", "ring"] }
 tokio-rustls = "0.26"
 webpki-roots = "0.26"
 

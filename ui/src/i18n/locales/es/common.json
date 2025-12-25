@@ -1,0 +1,17 @@
+{
+  "app": {
+    "title": "Mercados Betfair (WIN)"
+  },
+  "actions": {
+    "refresh": "Actualizar",
+    "loading": "Cargando…",
+    "back": "Volver"
+  },
+  "placeholder": {
+    "dash": "-"
+  },
+  "language": {
+    "en": "Inglés",
+    "es": "Español"
+  }
+}

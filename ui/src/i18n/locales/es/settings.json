@@ -1,0 +1,14 @@
+{
+  "panel": {
+    "title": "Ajustes"
+  },
+  "theme": {
+    "label": "Tema",
+    "light": "Claro",
+    "dark": "Oscuro",
+    "toggle": "Cambiar tema"
+  },
+  "language": {
+    "label": "Idioma"
+  }
+}

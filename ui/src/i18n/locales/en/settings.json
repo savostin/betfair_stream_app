@@ -1,0 +1,14 @@
+{
+  "panel": {
+    "title": "Settings"
+  },
+  "theme": {
+    "label": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "toggle": "Toggle theme"
+  },
+  "language": {
+    "label": "Language"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "panel": {
+    "title": "Markets"
+  },
+  "empty": {
+    "noMarkets": "No markets loaded.",
+    "selectTitle": "Select a market",
+    "selectSubtitle": "Choose a market on the left to subscribe."
+  },
+  "toast": {
+    "loadedMarkets": "Loaded {{count}} markets"
+  },
+  "status": {
+    "connecting": "Connecting/subscribing…"
+  },
+  "meta": {
+    "marketId": "marketId: {{id}}",
+    "matched": "Matched: {{amount}}"
+  },
+  "table": {
+    "selection": "Selection",
+    "back": "Back",
+    "ltp": "LTP",
+    "lay": "Lay"
+  }
+}

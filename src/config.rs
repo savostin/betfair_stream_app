@@ -55,6 +55,24 @@ pub struct Config {
     #[arg(long, env = "WS_SEND_TIMEOUT_MS", default_value_t = 5_000)]
     pub ws_send_timeout_ms: u64,
 
+    /// Serve the built web UI (Vite output) from `/`.
+    #[arg(long, env = "SERVE_UI", default_value_t = true)]
+    pub serve_ui: bool,
+
+    /// Directory containing the built UI assets (expects `index.html`).
+    ///
+    /// Default assumes you run from the repo root after building the UI: `ui/dist`.
+    #[arg(long, env = "UI_DIR", default_value = "ui/dist")]
+    pub ui_dir: String,
+
+    /// Enable HTTP reverse proxies for Betfair Identity and Betting API.
+    ///
+    /// Routes:
+    /// - `/bf-identity/*` -> `https://identitysso.betfair.com/*`
+    /// - `/bf-api/*` -> `https://api.betfair.com/*`
+    #[arg(long, env = "SERVE_BETFAIR_HTTP", default_value_t = true)]
+    pub serve_betfair_http: bool,
+
     /// Run as a Windows Service (used by SCM).
     ///
     /// This is intended to be launched by Windows Service Control Manager, not by users.

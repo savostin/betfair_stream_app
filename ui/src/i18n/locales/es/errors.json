@@ -1,0 +1,43 @@
+{
+  "validation": {
+    "appKeyRequired": "La clave de aplicación es obligatoria",
+    "usernameRequired": "El usuario es obligatorio",
+    "passwordRequired": "La contraseña es obligatoria"
+  },
+  "unexpected": {
+    "title": "Algo salió mal",
+    "withDetails": "Algo salió mal: {{details}}"
+  },
+  "betfair": {
+    "identity": {
+      "INVALID_USERNAME_OR_PASSWORD": "Usuario o contraseña inválidos ({{code}})",
+      "ACCOUNT_LOCKED": "La cuenta está bloqueada ({{code}})",
+      "ACCOUNT_SUSPENDED": "La cuenta está suspendida ({{code}})",
+      "INVALID_APP_KEY": "Clave de aplicación inválida ({{code}})",
+      "INVALID_CONNECTIVITY_TO_REGULATOR_DK": "Error de conectividad con el regulador (DK) ({{code}})",
+      "INVALID_CONNECTIVITY_TO_REGULATOR_IT": "Error de conectividad con el regulador (IT) ({{code}})",
+      "INVALID_CONNECTIVITY_TO_REGULATOR_NZ": "Error de conectividad con el regulador (NZ) ({{code}})",
+      "KYC_SUSPEND": "Cuenta suspendida (KYC) ({{code}})",
+      "PENDING_AUTH": "Se requiere autenticación adicional ({{code}})",
+      "SECURITY_QUESTION_WRONG_3X": "La pregunta de seguridad falló demasiadas veces ({{code}})",
+      "SELF_EXCLUDED": "La cuenta está auto-excluida ({{code}})",
+      "TOO_MANY_REQUESTS": "Demasiadas solicitudes, inténtalo más tarde ({{code}})",
+      "unknown": "Error de inicio de sesión ({{code}})"
+    },
+    "api": {
+      "listMarketCatalogueFailed": "listMarketCatalogue falló ({{status}})",
+      "listMarketCatalogueFailedWithDetails": "listMarketCatalogue falló ({{status}}): {{details}}"
+    }
+  },
+  "stream": {
+    "websocketConnected": "WebSocket conectado",
+    "websocketDisconnected": "WebSocket desconectado",
+    "websocketError": "Error de WebSocket",
+    "authenticated": "Autenticado",
+    "authenticationFailed": "Falló la autenticación",
+    "authenticationFailedWithDetails": "Falló la autenticación: {{details}}",
+    "subscriptionFailed": "Falló la suscripción",
+    "subscriptionFailedWithDetails": "Falló la suscripción: {{details}}",
+    "connectionId": "connectionId={{id}}"
+  }
+}

@@ -26,6 +26,25 @@ cargo run
 - Health: `http://127.0.0.1:8080/healthz`
 - WebSocket: `ws://127.0.0.1:8080/ws`
 
+## Web UI (SPA)
+
+This repo includes a React/Vite single-page app in [ui/](ui/) that can be served by the Rust proxy (same origin):
+
+- UI: `http://127.0.0.1:8080/`
+
+The server also exposes HTTP reverse proxies used by the UI:
+
+- `POST /bf-identity/api/login` → `https://identitysso.betfair.com/api/login`
+- `POST /bf-api/exchange/betting/rest/v1.0/listMarketCatalogue/` → `https://api.betfair.com/...`
+
+Build the UI once:
+
+```bash
+cd ui
+npm install
+npm run build
+```
+
 ## Optional GUI
 
 Build with GUI support:

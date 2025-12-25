@@ -1,0 +1,43 @@
+{
+  "validation": {
+    "appKeyRequired": "Application key is required",
+    "usernameRequired": "Username is required",
+    "passwordRequired": "Password is required"
+  },
+  "unexpected": {
+    "title": "Something went wrong",
+    "withDetails": "Something went wrong: {{details}}"
+  },
+  "betfair": {
+    "identity": {
+      "INVALID_USERNAME_OR_PASSWORD": "Invalid username or password ({{code}})",
+      "ACCOUNT_LOCKED": "Account is locked ({{code}})",
+      "ACCOUNT_SUSPENDED": "Account is suspended ({{code}})",
+      "INVALID_APP_KEY": "Invalid application key ({{code}})",
+      "INVALID_CONNECTIVITY_TO_REGULATOR_DK": "Regulator connectivity error (DK) ({{code}})",
+      "INVALID_CONNECTIVITY_TO_REGULATOR_IT": "Regulator connectivity error (IT) ({{code}})",
+      "INVALID_CONNECTIVITY_TO_REGULATOR_NZ": "Regulator connectivity error (NZ) ({{code}})",
+      "KYC_SUSPEND": "Account suspended (KYC) ({{code}})",
+      "PENDING_AUTH": "Additional authentication required ({{code}})",
+      "SECURITY_QUESTION_WRONG_3X": "Security question failed too many times ({{code}})",
+      "SELF_EXCLUDED": "Account is self-excluded ({{code}})",
+      "TOO_MANY_REQUESTS": "Too many requests, try again later ({{code}})",
+      "unknown": "Login failed ({{code}})"
+    },
+    "api": {
+      "listMarketCatalogueFailed": "listMarketCatalogue failed ({{status}})",
+      "listMarketCatalogueFailedWithDetails": "listMarketCatalogue failed ({{status}}): {{details}}"
+    }
+  },
+  "stream": {
+    "websocketConnected": "WebSocket connected",
+    "websocketDisconnected": "WebSocket disconnected",
+    "websocketError": "WebSocket error",
+    "authenticated": "Authenticated",
+    "authenticationFailed": "Authentication failed",
+    "authenticationFailedWithDetails": "Authentication failed: {{details}}",
+    "subscriptionFailed": "Subscription failed",
+    "subscriptionFailedWithDetails": "Subscription failed: {{details}}",
+    "connectionId": "connectionId={{id}}"
+  }
+}

@@ -1,14 +1,19 @@
 use crate::config::Config;
 use axum::{
-    extract::{ws::WebSocketUpgrade, State},
+    extract::ws::WebSocketUpgrade,
+    extract::Path,
     http::HeaderMap,
+    http::{header, Method, Uri},
     http::StatusCode,
-    response::IntoResponse,
-    routing::get,
+    response::{IntoResponse, Response},
+    routing::{any, get},
+    Extension,
     Router,
 };
+use bytes::Bytes;
 use std::sync::Arc;
 use tokio_util::sync::CancellationToken;
+use tower_http::services::{ServeDir, ServeFile};
 use tower_http::trace::TraceLayer;
 use tracing::{info, warn};
 
@@ -16,11 +21,17 @@ use tracing::{info, warn};
 struct AppState {
     config: Arc<Config>,
     tls: Arc<tokio_rustls::TlsConnector>,
+    http: reqwest::Client,
 }
 
 pub fn run_from_cli(force_gui: bool) {
     let config = Config::parse();
     let config = Arc::new(config);
+
+    // Ensure a process-wide rustls CryptoProvider is installed.
+    // Some dependency combinations (e.g., bringing in reqwest + rustls) can enable
+    // multiple providers, which requires explicit selection.
+    let _ = rustls::crypto::ring::default_provider().install_default();
 
     // Decide whether to use GUI mode.
     // - CLI: enabled by --gui (config.gui)
@@ -124,13 +135,39 @@ pub(crate) async fn run_server(
     tls: Arc<tokio_rustls::TlsConnector>,
     gui_shutdown: Option<tokio::sync::oneshot::Receiver<()>>,
 ) -> Result<(), crate::error::AppError> {
-    let state = AppState { config, tls };
+    let http = reqwest::Client::builder()
+        .user_agent("betfair_stream_proxy")
+        .build()
+        .map_err(|e| std::io::Error::other(e.to_string()))?;
 
-    let app = Router::new()
+    let state = AppState { config, tls, http };
+
+    let mut app = Router::new()
         .route("/healthz", get(healthz))
-        .route("/ws", get(ws_handler))
+        .route("/ws", get(ws_handler));
+
+    if state.config.serve_betfair_http {
+        app = app
+            .route("/bf-identity/*path", any(bf_identity_proxy))
+            .route("/bf-api/*path", any(bf_api_proxy));
+    }
+
+    if state.config.serve_ui {
+        let ui_dir = std::path::PathBuf::from(&state.config.ui_dir);
+        let index = ui_dir.join("index.html");
+        if index.exists() {
+            let ui_service = ServeDir::new(ui_dir).not_found_service(ServeFile::new(index));
+            app = app.nest_service("/", ui_service);
+        } else {
+            app = app.route("/", get(ui_missing));
+        }
+    }
+
+    // Apply layers after all routes are registered so everything (including
+    // routes added conditionally and nested services) sees the same middleware.
+    app = app
         .layer(TraceLayer::new_for_http())
-        .with_state(state.clone());
+        .layer(Extension(state.clone()));
 
     let listener = tokio::net::TcpListener::bind(&state.config.bind).await?;
     info!(bind = %state.config.bind, "listening");
@@ -143,6 +180,127 @@ pub(crate) async fn run_server(
     Ok(())
 }
 
+async fn ui_missing() -> impl IntoResponse {
+    (
+        StatusCode::NOT_FOUND,
+        "UI not found. Build it with: cd ui && npm install && npm run build",
+    )
+}
+
+async fn bf_identity_proxy(
+    Extension(state): Extension<AppState>,
+    Path(path): Path<String>,
+    method: Method,
+    headers: HeaderMap,
+    uri: Uri,
+    body: axum::body::Body,
+) -> Response {
+    // Allowlist to avoid turning this into a general-purpose proxy.
+    if path != "api/login" {
+        return (StatusCode::NOT_FOUND, "unsupported identity endpoint").into_response();
+    }
+
+    let base = format!("https://identitysso.betfair.com/{path}");
+    proxy_http(&state.http, base, method, headers, uri, body, 256 * 1024).await
+}
+
+async fn bf_api_proxy(
+    Extension(state): Extension<AppState>,
+    Path(path): Path<String>,
+    method: Method,
+    headers: HeaderMap,
+    uri: Uri,
+    body: axum::body::Body,
+) -> Response {
+    // Allowlist key betting API endpoints typically needed by the UI.
+    let allowed = path.starts_with("exchange/betting/rest/v1.0/")
+        || path == "exchange/betting/json-rpc/v1";
+    if !allowed {
+        return (StatusCode::NOT_FOUND, "unsupported api endpoint").into_response();
+    }
+
+    let base = format!("https://api.betfair.com/{path}");
+    proxy_http(&state.http, base, method, headers, uri, body, 2 * 1024 * 1024).await
+}
+
+async fn proxy_http(
+    client: &reqwest::Client,
+    base_url: String,
+    method: Method,
+    headers: HeaderMap,
+    uri: Uri,
+    body: axum::body::Body,
+    max_body_bytes: usize,
+) -> Response {
+    let url = if let Some(q) = uri.query() {
+        format!("{base_url}?{q}")
+    } else {
+        base_url
+    };
+
+    let body_bytes = match axum::body::to_bytes(body, max_body_bytes).await {
+        Ok(b) => b,
+        Err(_) => return (StatusCode::PAYLOAD_TOO_LARGE, "request body too large").into_response(),
+    };
+
+    let mut req = client.request(method, url);
+
+    // Copy headers, skipping hop-by-hop and Host.
+    for (name, value) in headers.iter() {
+        if name == header::HOST
+            || name == header::CONNECTION
+            || name == header::PROXY_AUTHENTICATE
+            || name == header::PROXY_AUTHORIZATION
+            || name == header::TE
+            || name == header::TRAILER
+            || name == header::TRANSFER_ENCODING
+            || name == header::UPGRADE
+        {
+            continue;
+        }
+        req = req.header(name, value);
+    }
+
+    req = req.body(body_bytes);
+
+    let resp = match req.send().await {
+        Ok(r) => r,
+        Err(e) => {
+            return (
+                StatusCode::BAD_GATEWAY,
+                format!("upstream request failed: {e}"),
+            )
+                .into_response()
+        }
+    };
+
+    let status = resp.status();
+    let mut out_headers = HeaderMap::new();
+    for (name, value) in resp.headers().iter() {
+        if name == header::CONNECTION
+            || name == header::PROXY_AUTHENTICATE
+            || name == header::TRANSFER_ENCODING
+            || name == header::UPGRADE
+        {
+            continue;
+        }
+        out_headers.insert(name.clone(), value.clone());
+    }
+
+    let bytes = match resp.bytes().await {
+        Ok(b) => b,
+        Err(e) => {
+            return (
+                StatusCode::BAD_GATEWAY,
+                format!("failed reading upstream body: {e}"),
+            )
+                .into_response()
+        }
+    };
+
+    (status, out_headers, Bytes::from(bytes)).into_response()
+}
+
 async fn healthz() -> impl IntoResponse {
     (StatusCode::OK, "ok")
 }
@@ -150,7 +308,7 @@ async fn healthz() -> impl IntoResponse {
 async fn ws_handler(
     ws: WebSocketUpgrade,
     headers: HeaderMap,
-    State(state): State<AppState>,
+    Extension(state): Extension<AppState>,
 ) -> impl IntoResponse {
     if let Err(resp) = validate_origin(&headers, &state.config) {
         return resp.into_response();
@@ -308,9 +466,16 @@ async fn proxy_session(
 }
 
 fn normalize_ws_payload(s: &str) -> String {
-    // Browser clients sometimes send JSON with a trailing CRLF. The upstream framing already appends CRLF.
-    // Strip common line endings to avoid sending double-CRLF.
-    s.trim_end_matches(['\r', '\n']).to_string()
+    // Upstream transport is CRLF-delimited JSON. If a client sends JSON containing raw newlines
+    // (e.g. pretty-printed), it can break the upstream framing. Remove any raw CR/LF characters
+    // and rely on the upstream writer to append a single CRLF delimiter.
+    let mut out = String::with_capacity(s.len());
+    for ch in s.chars() {
+        if ch != '\r' && ch != '\n' {
+            out.push(ch);
+        }
+    }
+    out.trim().to_string()
 }
 
 fn validate_origin(headers: &HeaderMap, cfg: &Config) -> Result<(), (StatusCode, &'static str)> {
