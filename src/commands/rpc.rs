@@ -38,8 +38,7 @@ pub async fn betfair_rpc(
         args.params,
     )
     .await
-    .map_err(|e| {
+    .inspect_err(|e| {
         warn!(key = %e.key, "betfair_rpc failed");
-        e
     })
 }

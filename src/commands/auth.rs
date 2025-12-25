@@ -23,7 +23,7 @@ pub async fn auth_status(state: State<'_, AppState>) -> Result<AuthStatus, Strin
     let token = state.session_token.read().await;
     info!("auth_status");
     Ok(AuthStatus {
-        is_logged_in: token.as_deref().unwrap_or("").len() > 0,
+        is_logged_in: !token.as_deref().unwrap_or("").is_empty(),
     })
 }
 
@@ -59,9 +59,8 @@ pub async fn auth_login(
         &args.password,
     )
     .await
-    .map_err(|e| {
+    .inspect_err(|e| {
         warn!(key = %e.key, "auth_login failed");
-        e
     })?;
 
     let mut token_state = state.session_token.write().await;
