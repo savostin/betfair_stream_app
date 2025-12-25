@@ -66,6 +66,7 @@
   - Confirmed `cargo build` succeeds after the root-layout + hook changes.
   - Updated remaining markdown/docs naming to "BetFair Stream API App" and removed stale references.
   - Committed the Tauri-only root-layout migration + naming updates (commit: e38a0ff).
+  - Switched Tauri bundling icon paths to `assets/icon.*` and removed the unused `icons/` folder (commit: f118416).
 - Now:
   - Validate end-to-end in Tauri dev: login → markets → select market → live stream updates.
   - Investigate/fix Betfair JSON-RPC error after login: `ANGX-0007` (HTTP 200, code -32099). Mitigation in progress: send single JSON-RPC object instead of 1-element batch array.
