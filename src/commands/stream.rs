@@ -1,6 +1,6 @@
+use crate::codec::CrlfTextCodec;
 use crate::state::AppState;
 use crate::stream::{StreamConnection, EVENT_STREAM_LINE};
-use crate::codec::CrlfTextCodec;
 use futures_util::{SinkExt, StreamExt};
 use tauri::{AppHandle, Emitter, State};
 use tracing::{info, warn};
@@ -115,7 +115,9 @@ pub async fn stream_send(state: State<'_, AppState>, line: String) -> Result<(),
         return Err("errors:stream.notConnected".to_string());
     };
 
-    tx.send(line).await.map_err(|_| "errors:stream.notConnected".to_string())?;
+    tx.send(line)
+        .await
+        .map_err(|_| "errors:stream.notConnected".to_string())?;
     Ok(())
 }
 

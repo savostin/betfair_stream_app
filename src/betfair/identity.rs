@@ -12,7 +12,11 @@ struct IdentityJsonResponse {
     error: Option<String>,
 }
 
-fn identity_error_payload(code: &str, status_code: reqwest::StatusCode, content_type: &str) -> UiErrorPayload {
+fn identity_error_payload(
+    code: &str,
+    status_code: reqwest::StatusCode,
+    content_type: &str,
+) -> UiErrorPayload {
     let known = [
         "INVALID_USERNAME_OR_PASSWORD",
         "ACCOUNT_LOCKED",
@@ -108,7 +112,11 @@ pub async fn login(
 
             if status == "FAIL" {
                 let code = v.error.unwrap_or_else(|| "UNKNOWN".to_string());
-                return Err(identity_error_payload(code.trim(), status_code, content_type.as_str()));
+                return Err(identity_error_payload(
+                    code.trim(),
+                    status_code,
+                    content_type.as_str(),
+                ));
             }
         }
     }
@@ -121,7 +129,9 @@ pub async fn login(
         let mut it = part.splitn(2, '=');
         let k = it.next().unwrap_or("");
         let v = it.next().unwrap_or("");
-        let v = urlencoding::decode(v).unwrap_or_else(|_| v.into()).to_string();
+        let v = urlencoding::decode(v)
+            .unwrap_or_else(|_| v.into())
+            .to_string();
         match k {
             "status" => status = Some(v),
             "token" => token = Some(v),
@@ -143,7 +153,11 @@ pub async fn login(
         }
         Some("FAIL") => {
             let code = error.unwrap_or_else(|| "UNKNOWN".to_string());
-            Err(identity_error_payload(code.trim(), status_code, content_type.as_str()))
+            Err(identity_error_payload(
+                code.trim(),
+                status_code,
+                content_type.as_str(),
+            ))
         }
         _ => {
             // Common reason: HTML/redirect response (geo/regulator) or unexpected format.

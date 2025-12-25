@@ -36,7 +36,10 @@ pub async fn auth_logout(state: State<'_, AppState>) -> Result<(), String> {
 }
 
 #[tauri::command]
-pub async fn auth_login(state: State<'_, AppState>, args: AuthLoginArgs) -> Result<(), UiErrorPayload> {
+pub async fn auth_login(
+    state: State<'_, AppState>,
+    args: AuthLoginArgs,
+) -> Result<(), UiErrorPayload> {
     info!(username = %args.username.trim(), "auth_login");
     if args.username.trim().is_empty() {
         return Err(UiErrorPayload::key("errors:validation.usernameRequired"));
