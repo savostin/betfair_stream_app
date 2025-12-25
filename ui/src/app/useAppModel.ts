@@ -6,12 +6,8 @@ import { useMarketStream } from '../hooks/useMarketStream'
 import { useSession } from '../hooks/useSession'
 
 export type AppModel = {
-  // Session/config
-  appKey: string
-  wsUrl: string
+  // Session
   isAuthed: boolean
-  setAppKey: (next: string) => void
-  setWsUrl: (next: string) => void
   login: (args: { username: string; password: string }) => Promise<void>
   logout: () => void
 
@@ -44,16 +40,13 @@ export function useAppModel(): AppModel {
   const session = useSession()
 
   const markets = useMarkets({
-    appKey: session.appKey,
-    sessionToken: session.sessionToken,
+    isAuthed: session.isAuthed,
     onLoaded: (count) => snackbar.showInfo('markets:toast.loadedMarkets', { count }),
     onError: snackbar.showFromUnknownError,
   })
 
   const stream = useMarketStream({
-    wsUrl: session.wsUrl,
-    appKey: session.appKey,
-    sessionToken: session.sessionToken,
+    isAuthed: session.isAuthed,
     onInfo: (m) => snackbar.showFromUiMessage('info', m),
     onError: (m) => snackbar.showFromUiMessage('error', m),
   })
@@ -75,11 +68,7 @@ export function useAppModel(): AppModel {
   }
 
   return {
-    appKey: session.appKey,
-    wsUrl: session.wsUrl,
     isAuthed: session.isAuthed,
-    setAppKey: session.setAppKey,
-    setWsUrl: session.setWsUrl,
     login,
     logout,
 

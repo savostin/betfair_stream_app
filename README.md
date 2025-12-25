@@ -45,6 +45,18 @@ npm install
 npm run build
 ```
 
+## Planned: Proper Tauri App
+
+This repo is planned to evolve into a **proper Tauri v2 app** (desktop first, mobile-ready) where:
+- Betfair auth + session token are kept on the Rust side
+- Betfair AppKey is embedded at build time
+- The UI calls Rust via Tauri `invoke()` and receives stream updates via events
+
+Design docs:
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+- [docs/TAURI_MIGRATION.md](docs/TAURI_MIGRATION.md)
+- [docs/BETFAIR_RPC_GATEWAY.md](docs/BETFAIR_RPC_GATEWAY.md)
+
 ## Optional GUI
 
 Build with GUI support:

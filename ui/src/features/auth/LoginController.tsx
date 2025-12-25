@@ -2,10 +2,6 @@ import { useState, type FormEvent } from 'react'
 import { LoginView } from './LoginView'
 
 export function LoginController(props: {
-  appKey: string
-  wsUrl: string
-  setAppKey: (next: string) => void
-  setWsUrl: (next: string) => void
   login: (args: { username: string; password: string }) => Promise<void>
 }): React.ReactNode {
   const [username, setUsername] = useState('')
@@ -19,12 +15,8 @@ export function LoginController(props: {
 
   return (
     <LoginView
-      appKey={props.appKey}
-      wsUrl={props.wsUrl}
       username={username}
       password={password}
-      onChangeAppKey={props.setAppKey}
-      onChangeWsUrl={props.setWsUrl}
       onChangeUsername={setUsername}
       onChangePassword={setPassword}
       onSubmit={onSubmit}

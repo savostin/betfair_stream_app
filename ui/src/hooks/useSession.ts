@@ -1,60 +1,48 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { betfairLogin } from '../lib/betfair'
-import { clearSession, getAppKey, getSessionToken, setAppKey as persistAppKey, setSessionToken } from '../lib/storage'
 import { UiError } from '../errors/UiError'
+import { tauriInvoke } from '../lib/tauri'
 
 export type SessionState = {
-  appKey: string
-  wsUrl: string
-  sessionToken: string
   isAuthed: boolean
-  setAppKey: (next: string) => void
-  setWsUrl: (next: string) => void
   login: (args: { username: string; password: string }) => Promise<void>
   logout: () => void
 }
 
-const DEFAULT_WS_URL = 'ws://127.0.0.1:8080/ws'
-
 export function useSession(): SessionState {
-  const [appKey, setAppKeyState] = useState(() => getAppKey())
-  const [wsUrl, setWsUrlState] = useState(() => DEFAULT_WS_URL)
-  const [sessionToken, setSessionTokenState] = useState(() => getSessionToken())
+  const [isAuthed, setIsAuthed] = useState(false)
 
-  const setAppKey = useCallback((next: string) => {
-    setAppKeyState(next)
-    persistAppKey(next)
-  }, [])
-
-  const setWsUrl = useCallback((next: string) => {
-    setWsUrlState(next)
+  useEffect(() => {
+    void (async () => {
+      try {
+        const status = await tauriInvoke<{ isLoggedIn: boolean }>('auth_status')
+        setIsAuthed(Boolean(status?.isLoggedIn))
+      } catch {
+        setIsAuthed(false)
+      }
+    })()
   }, [])
 
   const login = useCallback(
     async (args: { username: string; password: string }) => {
-      if (!appKey) throw new UiError({ key: 'errors:validation.appKeyRequired' })
       if (!args.username) throw new UiError({ key: 'errors:validation.usernameRequired' })
       if (!args.password) throw new UiError({ key: 'errors:validation.passwordRequired' })
 
-      const token = await betfairLogin({ appKey, username: args.username, password: args.password })
-      setSessionToken(token)
-      setSessionTokenState(token)
+      await betfairLogin({ username: args.username, password: args.password })
+      setIsAuthed(true)
     },
-    [appKey],
+    [],
   )
 
   const logout = useCallback(() => {
-    clearSession()
-    setSessionTokenState('')
+    void tauriInvoke<void>('auth_logout').catch(() => {
+      // ignore
+    })
+    setIsAuthed(false)
   }, [])
 
   return {
-    appKey,
-    wsUrl,
-    sessionToken,
-    isAuthed: Boolean(sessionToken),
-    setAppKey,
-    setWsUrl,
+    isAuthed,
     login,
     logout,
   }

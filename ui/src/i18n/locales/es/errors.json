@@ -8,8 +8,13 @@
     "title": "Algo salió mal",
     "withDetails": "Algo salió mal: {{details}}"
   },
+  "auth": {
+    "notLoggedIn": "No has iniciado sesión"
+  },
   "betfair": {
     "identity": {
+      "invalidResponse": "El inicio de sesión falló por una respuesta inesperada (status={{httpStatus}}, content-type={{contentType}}, code={{code}})",
+      "missingSessionToken": "El inicio de sesión fue exitoso pero no se devolvió un token de sesión (status={{httpStatus}}, content-type={{contentType}}, code={{code}})",
       "INVALID_USERNAME_OR_PASSWORD": "Usuario o contraseña inválidos ({{code}})",
       "ACCOUNT_LOCKED": "La cuenta está bloqueada ({{code}})",
       "ACCOUNT_SUSPENDED": "La cuenta está suspendida ({{code}})",
@@ -23,6 +28,10 @@
       "SELF_EXCLUDED": "La cuenta está auto-excluida ({{code}})",
       "TOO_MANY_REQUESTS": "Demasiadas solicitudes, inténtalo más tarde ({{code}})",
       "unknown": "Error de inicio de sesión ({{code}})"
+    },
+    "rpc": {
+      "failed": "Falló la llamada RPC de Betfair (status={{httpStatus}}, code={{code}}, message={{message}})",
+      "invalidResponse": "La llamada RPC de Betfair devolvió una respuesta inesperada (status={{httpStatus}})"
     },
     "api": {
       "listMarketCatalogueFailed": "listMarketCatalogue falló ({{status}})",

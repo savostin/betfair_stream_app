@@ -10,13 +10,11 @@ export type MarketsState = {
 }
 
 export function useMarkets({
-  appKey,
-  sessionToken,
+  isAuthed,
   onLoaded,
   onError,
 }: {
-  appKey: string
-  sessionToken: string
+  isAuthed: boolean
   onLoaded?: (count: number) => void
   onError?: (e: unknown) => void
 }): MarketsState {
@@ -39,11 +37,11 @@ export function useMarkets({
   }, [])
 
   const refreshMarkets = useCallback(async () => {
-    if (!appKey || !sessionToken) return
+    if (!isAuthed) return
 
     setMarketsLoading(true)
     try {
-      const data = await listNextHorseWinMarkets({ appKey, sessionToken })
+      const data = await listNextHorseWinMarkets()
       setMarkets(data)
       onLoadedRef.current?.(data.length)
     } catch (e) {
@@ -51,12 +49,12 @@ export function useMarkets({
     } finally {
       setMarketsLoading(false)
     }
-  }, [appKey, sessionToken])
+  }, [isAuthed])
 
   useEffect(() => {
-    if (!appKey || !sessionToken) return
+    if (!isAuthed) return
     void refreshMarkets()
-  }, [appKey, sessionToken, refreshMarkets])
+  }, [isAuthed, refreshMarkets])
 
   return { markets, marketsLoading, refreshMarkets, clearMarkets }
 }

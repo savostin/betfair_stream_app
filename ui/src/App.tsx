@@ -48,10 +48,6 @@ function App() {
               isAuthed={model.isAuthed}
               unauthenticated={
                 <LoginController
-                  appKey={model.appKey}
-                  wsUrl={model.wsUrl}
-                  setAppKey={model.setAppKey}
-                  setWsUrl={model.setWsUrl}
                   login={model.login}
                 />
               }

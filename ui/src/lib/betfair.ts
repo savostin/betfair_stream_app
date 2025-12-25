@@ -1,79 +1,81 @@
-import type { BetfairLoginResponse, ListMarketCatalogueResponse } from '../types/betfair'
+import type { ListMarketCatalogueResponse } from '../types/betfair'
 import { UiError } from '../errors/UiError'
+import { tauriInvoke } from './tauri'
+
+type TauriInvokeUiError = { key: string; values?: Record<string, unknown> }
+
+function extractInvokeUiError(e: unknown): TauriInvokeUiError | null {
+  if (typeof e === 'object' && e !== null) {
+    const anyErr = e as any
+
+    if (typeof anyErr.key === 'string') {
+      return { key: anyErr.key, values: anyErr.values ?? undefined }
+    }
+
+    if (typeof anyErr.error === 'object' && anyErr.error !== null && typeof anyErr.error.key === 'string') {
+      return { key: anyErr.error.key, values: anyErr.error.values ?? undefined }
+    }
+
+    if (typeof anyErr.message === 'string') {
+      const msg = anyErr.message.trim()
+
+      if (msg.startsWith('errors:')) {
+        return { key: msg, values: {} }
+      }
+
+      // Tauri may wrap structured errors into Error.message as JSON.
+      if (msg.startsWith('{') && msg.endsWith('}')) {
+        try {
+          const parsed = JSON.parse(msg)
+          if (parsed && typeof parsed.key === 'string') {
+            return { key: parsed.key, values: parsed.values ?? undefined }
+          }
+          if (parsed && parsed.error && typeof parsed.error.key === 'string') {
+            return { key: parsed.error.key, values: parsed.error.values ?? undefined }
+          }
+        } catch {
+          // ignore
+        }
+      }
+    }
+  }
+
+  if (typeof e === 'string') {
+    const msg = e.trim()
+    if (msg.startsWith('errors:')) return { key: msg, values: {} }
+    if (msg.startsWith('{') && msg.endsWith('}')) {
+      try {
+        const parsed = JSON.parse(msg)
+        if (parsed && typeof parsed.key === 'string') {
+          return { key: parsed.key, values: parsed.values ?? undefined }
+        }
+      } catch {
+        // ignore
+      }
+    }
+  }
+
+  return null
+}
 
 export type LoginArgs = {
-  appKey: string
   username: string
   password: string
 }
 
-export async function betfairLogin(args: LoginArgs): Promise<string> {
-  const body = new URLSearchParams()
-  body.set('username', args.username)
-  body.set('password', args.password)
-
-  const res = await fetch('/bf-identity/api/login', {
-    method: 'POST',
-    headers: {
-      'X-Application': args.appKey,
-      'Content-Type': 'application/x-www-form-urlencoded',
-      Accept: 'application/json',
-    },
-    body,
-  })
-
-  const data = (await res.json()) as BetfairLoginResponse
-
-  // Betfair Identity can return HTTP 200 with status=FAIL.
-  if (!res.ok) {
-    throw new UiError(identityErrorToUiError(data, String(res.status)))
+export async function betfairLogin(args: LoginArgs): Promise<void> {
+  try {
+    await tauriInvoke<void>('auth_login', {
+      args: { username: args.username, password: args.password },
+    })
+  } catch (e) {
+    const extracted = extractInvokeUiError(e)
+    if (extracted) throw new UiError(extracted)
+    throw e
   }
-
-  if (data.status && data.status !== 'SUCCESS') {
-    throw new UiError(identityErrorToUiError(data, String(data.status)))
-  }
-
-  const token = (data.sessionToken ?? data.token)?.trim()
-  if (!token) {
-    throw new UiError(identityErrorToUiError(data, 'MISSING_SESSION_TOKEN'))
-  }
-
-  return token
 }
 
-function identityErrorToUiError(
-  data: BetfairLoginResponse,
-  fallbackCode: string,
-): { key: string; values: Record<string, unknown> } {
-  const code = (data.error ?? '').trim() || fallbackCode
-
-  const knownCodes = new Set([
-    'INVALID_USERNAME_OR_PASSWORD',
-    'ACCOUNT_LOCKED',
-    'ACCOUNT_SUSPENDED',
-    'INVALID_APP_KEY',
-    'INVALID_CONNECTIVITY_TO_REGULATOR_DK',
-    'INVALID_CONNECTIVITY_TO_REGULATOR_IT',
-    'INVALID_CONNECTIVITY_TO_REGULATOR_NZ',
-    'KYC_SUSPEND',
-    'PENDING_AUTH',
-    'SECURITY_QUESTION_WRONG_3X',
-    'SELF_EXCLUDED',
-    'TOO_MANY_REQUESTS',
-  ])
-
-  const key = knownCodes.has(code) ? `errors:betfair.identity.${code}` : 'errors:betfair.identity.unknown'
-  return { key, values: { code } }
-}
-
-export type ListNextWinMarketsArgs = {
-  appKey: string
-  sessionToken: string
-}
-
-export async function listNextHorseWinMarkets(
-  args: ListNextWinMarketsArgs,
-): Promise<ListMarketCatalogueResponse> {
+export async function listNextHorseWinMarkets(): Promise<ListMarketCatalogueResponse> {
   const nowIso = new Date().toISOString()
 
   const requestBody = {
@@ -87,30 +89,13 @@ export async function listNextHorseWinMarkets(
     sort: 'FIRST_TO_START',
   }
 
-  const res = await fetch('/bf-api/exchange/betting/rest/v1.0/listMarketCatalogue/', {
-    method: 'POST',
-    headers: {
-      'X-Application': args.appKey,
-      'X-Authentication': args.sessionToken,
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
-    body: JSON.stringify(requestBody),
-  })
-
-  if (!res.ok) {
-    const text = await res.text().catch(() => '')
-    if (text) {
-      throw new UiError({
-        key: 'errors:betfair.api.listMarketCatalogueFailedWithDetails',
-        values: { status: res.status, details: text },
-      })
-    }
-    throw new UiError({
-      key: 'errors:betfair.api.listMarketCatalogueFailed',
-      values: { status: res.status },
+  try {
+    return await tauriInvoke<ListMarketCatalogueResponse>('betfair_rpc', {
+      args: { service: 'betting', method: 'listMarketCatalogue', params: requestBody },
     })
+  } catch (e) {
+    const extracted = extractInvokeUiError(e)
+    if (extracted) throw new UiError(extracted)
+    throw e
   }
-
-  return (await res.json()) as ListMarketCatalogueResponse
 }

@@ -3,12 +3,8 @@ import type { FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 
 export function LoginView(props: {
-  appKey: string
-  wsUrl: string
   username: string
   password: string
-  onChangeAppKey: (next: string) => void
-  onChangeWsUrl: (next: string) => void
   onChangeUsername: (next: string) => void
   onChangePassword: (next: string) => void
   onSubmit: (e: FormEvent) => void
@@ -17,27 +13,6 @@ export function LoginView(props: {
 
   return (
     <Stack spacing={1.5}>
-      <Paper variant="outlined" sx={{ p: 1.5 }}>
-        <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} alignItems={{ md: 'flex-end' }}>
-          <TextField
-            label={t('auth:config.appKeyLabel')}
-            value={props.appKey}
-            onChange={(e) => props.onChangeAppKey(e.target.value)}
-            placeholder={t('auth:config.appKeyPlaceholder')}
-            spellCheck={false}
-            fullWidth
-          />
-          <TextField
-            label={t('auth:config.wsUrlLabel')}
-            value={props.wsUrl}
-            onChange={(e) => props.onChangeWsUrl(e.target.value)}
-            placeholder={t('auth:config.wsUrlPlaceholder')}
-            spellCheck={false}
-            fullWidth
-          />
-        </Stack>
-      </Paper>
-
       <Paper variant="outlined" sx={{ p: 2 }}>
         <Typography variant="h6" sx={{ fontSize: 16, mb: 1 }}>
           {t('auth:login.sectionTitle')}
