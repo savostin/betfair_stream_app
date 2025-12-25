@@ -131,16 +131,31 @@ jobs:
           # Collect bundler outputs and rename into stable artifact names.
           BUNDLE_DIR="target/${{ matrix.target }}/release/bundle"
 
-          shopt -s nullglob
-          for f in "$BUNDLE_DIR"/**/*.dmg "$BUNDLE_DIR"/**/*.msi "$BUNDLE_DIR"/**/*.AppImage "$BUNDLE_DIR"/**/*.deb; do
+          found_any="0"
+          while IFS= read -r -d '' f; do
+            found_any="1"
             ext="${f##*.}"
             case "$f" in
               *.AppImage) ext="AppImage" ;;
             esac
             out="dist/${PKG_BASE}-${{ matrix.target }}-${VERSION}.${ext}"
             cp -f "$f" "$out"
-          done
-          shopt -u nullglob
+          done < <(
+            find "$BUNDLE_DIR" -type f \(
+              -name '*.dmg' -o -name '*.msi' -o -name '*.AppImage' -o -name '*.deb'
+            \) -print0
+          )
+
+          if [[ "$found_any" != "1" ]]; then
+            echo "ERROR: No bundle artifacts found under ${BUNDLE_DIR}" >&2
+            echo "Listing bundle directory (if it exists):" >&2
+            if [[ -d "$BUNDLE_DIR" ]]; then
+              find "$BUNDLE_DIR" -maxdepth 5 -type f -print >&2
+            else
+              echo "(missing directory)" >&2
+            fi
+            exit 1
+          fi
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
