@@ -31,13 +31,19 @@ impl AppState {
 }
 
 pub fn resolve_app_key() -> String {
-    // Prefer compile-time embedding; allow runtime env for local dev.
-    let embedded = option_env!("BETFAIR_APP_KEY").unwrap_or("");
-    if !embedded.trim().is_empty() {
-        return embedded.to_string();
+    // Prefer runtime env for local dev (including values loaded from `.env` in `main.rs`).
+    // This avoids getting stuck with a stale embedded key if you previously built with a
+    // different `BETFAIR_APP_KEY`.
+    if let Ok(v) = std::env::var("BETFAIR_APP_KEY") {
+        let v = v.trim().to_string();
+        if !v.is_empty() {
+            return v;
+        }
     }
 
-    std::env::var("BETFAIR_APP_KEY").unwrap_or_default()
+    // Fallback to compile-time embedding (used for release bundling/CI).
+    let embedded = option_env!("BETFAIR_APP_KEY").unwrap_or("");
+    embedded.trim().to_string()
 }
 
 fn build_allowlist_betting() -> HashSet<String> {

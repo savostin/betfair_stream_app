@@ -1,6 +1,6 @@
 use crate::state::AppState;
 use crate::stream::{StreamConnection, EVENT_STREAM_LINE};
-use betfair_stream_proxy::codec::CrlfTextCodec;
+use crate::codec::CrlfTextCodec;
 use futures_util::{SinkExt, StreamExt};
 use tauri::{AppHandle, Emitter, State};
 use tracing::{info, warn};

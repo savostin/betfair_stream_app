@@ -20,34 +20,37 @@ jobs:
           - name: linux-x86_64
             os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
-            bin: betfair_stream_proxy
-            ext: ""
-            archive: tar.gz
+            archive: linux
 
           - name: windows-x86_64
             os: windows-latest
             target: x86_64-pc-windows-msvc
-            bin: betfair_stream_proxy
-            ext: .exe
-            archive: msi
+            archive: windows
 
           # Build both mac architectures using the corresponding runner architecture
           - name: macos-aarch64
             os: macos-latest
             target: aarch64-apple-darwin
-            bin: betfair_stream_proxy
-            ext: ""
-            archive: dmg
+            archive: macos
 
           - name: macos-x86_64
             os: macos-15-intel
             target: x86_64-apple-darwin
-            bin: betfair_stream_proxy
-            ext: ""
-            archive: dmg
+            archive: macos
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: ui/package-lock.json
+
+      - name: UI deps
+        shell: bash
+        run: npm --prefix ui ci
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -85,99 +88,57 @@ jobs:
           echo "DMG_VOLUME_NAME=${APP_DMG_VOLUME_NAME}" >> "$GITHUB_ENV"
           echo "WINDOWS_PRODUCT_NAME=${APP_WINDOWS_PRODUCT_NAME}" >> "$GITHUB_ENV"
 
-      - name: Install Linux GUI deps
+      - name: Install Linux deps (Tauri)
         if: runner.os == 'Linux'
+        shell: bash
         run: |
+          set -euo pipefail
           sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libayatana-appindicator3-dev libxdo-dev
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libgtk-3-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            patchelf
 
-      - name: Build
-        run: cargo build --release --locked --target ${{ matrix.target }} --features gui --bins
-
-      - name: Bundle macOS .app
-        if: runner.os == 'macOS'
+      - name: Install tauri-cli
         shell: bash
+        run: cargo install tauri-cli --version 2.9.5 --locked
+
+      - name: Build bundles
+        shell: bash
+        env:
+          BETFAIR_APP_KEY: ${{ secrets.BETFAIR_APP_KEY }}
         run: |
           set -euo pipefail
-          mkdir -p dist
-          VERSION="${GITHUB_REF_NAME#v}" APP_BUNDLE_NAME="${APP_NAME}" BUNDLE_ID="${BUNDLE_ID}" \
-            scripts/macos-bundle.sh "target/${{ matrix.target }}/release/${{ matrix.bin }}" dist
-
-      - name: Package (tar.gz)
-        if: matrix.archive == 'tar.gz'
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p dist
           VERSION="${GITHUB_REF_NAME#v}"
+          # Keep artifacts contained under target/ for predictable paths.
+          export CARGO_TARGET_DIR="target"
+          cargo tauri build --target "${{ matrix.target }}"
+
+          mkdir -p dist
           PKG_BASE="$(echo "${APP_NAME}" | tr ' ' '-' | tr -cd 'A-Za-z0-9._-')"
-          cp "target/${{ matrix.target }}/release/${{ matrix.bin }}${{ matrix.ext }}" "dist/${PKG_BASE}-${{ matrix.target }}-${VERSION}${{ matrix.ext }}"
-          if [[ "${{ runner.os }}" == "macOS" ]]; then
-            tar -C dist -czf "dist/${{ matrix.bin }}-${{ matrix.target }}-${VERSION}.tar.gz" \
-              "${{ matrix.bin }}-${{ matrix.target }}-${VERSION}${{ matrix.ext }}" \
-              "betfair_stream_proxy.app"
 
-            # Avoid uploading the unpacked .app contents as individual artifacts.
-            rm -rf "dist/betfair_stream_proxy.app"
-          else
-            tar -C dist -czf "dist/${PKG_BASE}-${{ matrix.target }}-${VERSION}.tar.gz" "${PKG_BASE}-${{ matrix.target }}-${VERSION}${{ matrix.ext }}"
-          fi
+          # Collect bundler outputs and rename into stable artifact names.
+          BUNDLE_DIR="target/${{ matrix.target }}/release/bundle"
 
-          # Avoid uploading the raw binary in addition to the archive.
-          rm -f "dist/${PKG_BASE}-${{ matrix.target }}-${VERSION}${{ matrix.ext }}"
-
-      - name: Package (dmg)
-        if: matrix.archive == 'dmg'
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p dist
-          VERSION="${GITHUB_REF_NAME#v}"
-          DMG_NAME="${{ matrix.bin }}-${{ matrix.target }}-${VERSION}.dmg"
-          scripts/macos-dmg.sh "dist/${APP_NAME}.app" "dist/${DMG_NAME}"
-
-      - name: Package (msi)
-        if: matrix.archive == 'msi'
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = 'Stop'
-
-          New-Item -ItemType Directory -Force -Path dist | Out-Null
-          $staging = Join-Path -Path $pwd -ChildPath 'dist\\msi-staging'
-          New-Item -ItemType Directory -Force -Path $staging | Out-Null
-
-          # Stage the two Rust executables.
-          Copy-Item -Force -Path (Join-Path -Path 'target' -ChildPath "${{ matrix.target }}\\release\\${{ matrix.bin }}.exe") -Destination (Join-Path $staging 'betfair_stream_proxy.exe')
-          Copy-Item -Force -Path (Join-Path -Path 'target' -ChildPath "${{ matrix.target }}\\release\\${{ matrix.bin }}_gui.exe") -Destination (Join-Path $staging 'betfair_stream_proxy_gui.exe')
-
-          # Install WiX Toolset (v3) for MSI packaging.
-          choco install wixtoolset -y --no-progress
-
-          $version = "${{ github.ref_name }}".Replace('v','')
-          $productVersion = "$version.0"
-          $productName = "${{ env.WINDOWS_PRODUCT_NAME }}"
-          $wxs = Join-Path -Path 'installer' -ChildPath 'windows\\product.wxs'
-          $wixobj = Join-Path -Path 'dist' -ChildPath 'installer.wixobj'
-          $msi = Join-Path -Path 'dist' -ChildPath "${{ matrix.bin }}-${{ matrix.target }}.msi"
-
-          # Build MSI.
-          & candle.exe -nologo "-dProductVersion=$productVersion" "-dProductName=$productName" "-dStagingDir=$staging" -out $wixobj $wxs
-          light.exe -nologo -ext WixUIExtension -ext WixUtilExtension -out $msi $wixobj
-
-          # Clean staging outputs.
-          Remove-Item -Recurse -Force $staging
-          Remove-Item -Force $wixobj
+          shopt -s nullglob
+          for f in "$BUNDLE_DIR"/**/*.dmg "$BUNDLE_DIR"/**/*.msi "$BUNDLE_DIR"/**/*.AppImage "$BUNDLE_DIR"/**/*.deb; do
+            ext="${f##*.}"
+            case "$f" in
+              *.AppImage) ext="AppImage" ;;
+            esac
+            out="dist/${PKG_BASE}-${{ matrix.target }}-${VERSION}.${ext}"
+            cp -f "$f" "$out"
+          done
+          shopt -u nullglob
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.name }}
           path: |
-            dist/*.tar.gz
-            dist/*.zip
-            dist/*.msi
-            dist/*.cab
-            dist/*.dmg
+            dist/*
 
   publish:
     name: Publish GitHub Release
@@ -198,4 +159,6 @@ jobs:
             dist/**/*.zip
             dist/**/*.msi
             dist/**/*.dmg
+            dist/**/*.AppImage
+            dist/**/*.deb
           generate_release_notes: true

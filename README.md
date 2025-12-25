@@ -1,112 +1,56 @@
-# Betfair Stream API to Websocket Proxy
+# BetFair Stream API App (Tauri)
 
-![VIBE CODING](https://img.shields.io/badge/warning-VIBE_CODING-orange?logo=claude)  ![GitHub Release](https://img.shields.io/github/v/release/savostin/betfair_stream_proxy.rs)
+![GitHub Release](https://img.shields.io/github/v/release/savostin/betfair_stream_app.rs)
 
+Cross-platform **Tauri v2** desktop app that connects to Betfair Exchange APIs:
 
+- Auth (Identity): credentials handled in Rust; session token stays in Rust
+- JSON-RPC (Sports/Account/Heartbeat): UI calls Rust via Tauri `invoke()`
+- Stream API: Rust maintains the TLS stream and forwards updates to the UI via Tauri events
 
-A small Rust service that accepts browser WebSocket connections and proxies messages to/from the Betfair Exchange Stream API.
+Repo layout:
 
-The upstream Betfair stream transport (per [docs](docs/ExchangeStreamAPI-March2018.pdf)) is **TLS TCP** with **CRLF-delimited JSON**:
+- [ui/](ui/): React/Vite UI
+- [src/](src/): Tauri (Rust) app core
 
-- client sends: `{json}\r\n`
-- server responds: `{json}\r\n`
-
-This proxy is intentionally a **raw passthrough**: the browser client is responsible for sending the Betfair `authentication` message.
-
-## Requirements
+## Prereqs
 
 - Rust toolchain
+- Node.js (for the UI)
 
-## Run (dev)
+## Dev
 
-```bash
-cargo run
-```
-
-- Health: `http://127.0.0.1:8080/healthz`
-- WebSocket: `ws://127.0.0.1:8080/ws`
-
-## Web UI (SPA)
-
-This repo includes a React/Vite single-page app in [ui/](ui/) that can be served by the Rust proxy (same origin):
-
-- UI: `http://127.0.0.1:8080/`
-
-The server also exposes HTTP reverse proxies used by the UI:
-
-- `POST /bf-identity/api/login` → `https://identitysso.betfair.com/api/login`
-- `POST /bf-api/exchange/betting/rest/v1.0/listMarketCatalogue/` → `https://api.betfair.com/...`
-
-Build the UI once:
+Run the UI dev server, then run the desktop app in dev mode:
 
 ```bash
-cd ui
-npm install
-npm run build
+npm --prefix ui run dev
+cargo tauri dev
 ```
 
-## Planned: Proper Tauri App
+## Build (bundles/installers)
 
-This repo is planned to evolve into a **proper Tauri v2 app** (desktop first, mobile-ready) where:
-- Betfair auth + session token are kept on the Rust side
-- Betfair AppKey is embedded at build time
-- The UI calls Rust via Tauri `invoke()` and receives stream updates via events
-
-Design docs:
-- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
-- [docs/TAURI_MIGRATION.md](docs/TAURI_MIGRATION.md)
-- [docs/BETFAIR_RPC_GATEWAY.md](docs/BETFAIR_RPC_GATEWAY.md)
-
-## Optional GUI
-
-Build with GUI support:
+Build platform installers/bundles via the Tauri bundler:
 
 ```bash
-cargo build --release --features gui
+cargo tauri build
 ```
 
-Run with a tray icon:
+The UI production build is executed from `build.rs` during release builds (set `TAURI_SKIP_UI_BUILD=1` to skip if `ui/dist` is already up to date).
 
-```bash
-./target/release/betfair_stream_proxy --gui
-```
-
-macOS note: launching the raw binary from Finder will open Terminal. To launch as a proper GUI app (no Terminal window), build and create an app bundle:
-
-```bash
-cargo build --release --features gui
-scripts/macos-bundle.sh target/release/betfair_stream_proxy dist
-open dist/betfair_stream_proxy.app
-```
+Outputs are written under `target/**/release/bundle/` (e.g. `.dmg`, `.msi`, `.AppImage`, `.deb`).
 
 ## Configuration
 
-All options are available as CLI flags or environment variables (see `--help`). Key env vars:
+The Betfair AppKey is expected at build time:
 
-- `BIND` (default `127.0.0.1:8080`)
-- `BETFAIR_HOST` (default `stream-api.betfair.com`)
-- `BETFAIR_PORT` (default `443`)
-- `ALLOWED_ORIGINS` (comma-separated list; empty allows all)
-- `UPSTREAM_CONNECT_TIMEOUT_MS` (default `10000`)
-- `FIRST_MESSAGE_TIMEOUT_MS` (default `10000`)
-- `WS_MAX_MESSAGE_BYTES` (default `1048576`)
-- `WS_SEND_TIMEOUT_MS` (default `5000`)
+- `BETFAIR_APP_KEY` (set in CI via repository secrets)
 
-Logging:
-
-- `RUST_LOG=info` (default)
-
-## Build (release)
-
-```bash
-cargo build --release
-./target/release/betfair_stream_proxy
-```
+Runtime settings are stored by the app; see the UI settings screen.
 
 ## CI/CD
 
-- CI runs on every Pull Request and on pushes to `main`.
-- Release artifacts are built and published when you push a tag matching `v*` (for example `v1.0.1`).
+- CI runs on PRs and pushes to `main`.
+- Releases are built and published when pushing a tag matching `v*`.
 
 Suggested release flow:
 

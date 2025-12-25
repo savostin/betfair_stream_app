@@ -1,12 +1,8 @@
 # Tauri Migration Plan (Desktop-first, Mobile-ready)
 
 ## Summary
-This repo currently contains:
-- A Rust proxy/server that serves a Web UI and proxies Betfair HTTP + Stream API traffic.
-- A React/Vite/MUI UI in `ui/` that logs in, loads markets, and renders a live exchange-style table.
+This repo has been migrated to a **proper Tauri v2 app** where the **Rust core owns authentication and all Betfair API calls**.
 
-Planned target:
-- A **proper Tauri v2 app** where the **Rust core owns authentication and all Betfair API calls**.
 - The UI never sees or stores the Betfair session token.
 - The Betfair AppKey is embedded in the app at build time.
 
@@ -31,29 +27,10 @@ Planned target:
 5. UI calls `stream_subscribe_market(marketId, options)`.
 6. Rust authenticates stream using stored token; emits `betfair_stream_mcm` events.
 
-## Phased Delivery (recommended)
+## Notes
 
-### Phase 0 — Preparation (keep current working)
-- Keep the existing Rust proxy + UI build green.
-- Ensure stream framing/state logic is reusable as a Rust library module.
-
-### Phase 1 — Desktop MVP (Tauri v2)
-Goal: login → list markets → select market → receive live updates.
-
-Steps:
-1. Add a `src-tauri/` Tauri v2 app shell that loads the existing UI.
-2. Remove UI AppKey input and remove UI session token persistence.
-3. Implement Rust `AuthManager` state and commands:
-   - `auth_login(username, password)`
-   - `auth_logout()`
-   - `auth_status()`
-4. Implement Rust `BetfairRpcGateway` command:
-   - `betfair_rpc(service, method, params_json)`
-5. Implement Rust `StreamManager` commands + events:
-   - `stream_connect()` (lazy)
-   - `stream_subscribe_market(marketId, options)`
-   - `stream_unsubscribe_all()`
-   - Event: `betfair_stream_mcm` (payload: `mcm` JSON)
+- The Tauri crate lives at the repo root.
+- The UI lives in `ui/` and is built from `build.rs` during release builds (bundling).
 
 ### Phase 2 — “Full API support”
 Goal: full coverage of Betfair JSON-RPC params/filters without adding hundreds of commands.
@@ -79,5 +56,4 @@ Steps:
 
 ## Open Questions
 - Define “full support”: callable via generic JSON-RPC (fast) vs fully typed SDK (slow).
-- Desktop platform scope for MVP: macOS only vs macOS+Windows+Linux.
 - Mobile UX expectations for the ladder table.

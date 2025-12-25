@@ -1,41 +1,22 @@
-# Architecture: Current vs Target
+# Architecture
 
-## Current (Rust proxy + browser UI)
-- Rust server:
-  - Serves the built UI (`ui/dist`) at `http://127.0.0.1:8080/`.
-  - Exposes WS endpoint `/ws` which is a passthrough to Betfair Stream API (TLS TCP + CRLF JSON framing).
-  - Exposes HTTP reverse proxies for Betfair Identity + Betting API.
-- UI:
-  - Stores AppKey + session token (today) and calls proxy endpoints.
-  - Connects to local WS proxy and sends Stream API `authentication` messages.
+This repo is a single Tauri v2 desktop app.
 
-Strengths:
-- Simple web debugging.
-- UI and proxy are already working.
+## Components
 
-Pain points:
-- Secrets live in the UI (session token).
-- Localhost server/ports and proxy routes are extra moving parts.
-- Packaging is "service + UI" instead of a single app.
+- UI: React/Vite app in `ui/`
+  - Calls Rust via Tauri `invoke()`
+  - Receives Stream API updates via Tauri events
 
-## Target (Proper Tauri v2 app)
-- No localhost HTTP server required for normal operation.
-- Rust core owns:
-  - Login + session token lifecycle
-  - Betfair API requests
-  - Stream API connection + subscriptions
-- UI owns:
-  - Rendering and UX only
-  - Calls `invoke()` for API requests
-  - Listens to Tauri events for stream updates
+- Rust core: Tauri app in `src/`
+  - Owns Betfair auth (session token never leaves Rust)
+  - Provides an allowlisted Betfair JSON-RPC gateway
+  - Maintains the Stream API TLS connection and subscriptions
 
-### Why this target fits desktop + future mobile
-- Avoids port binding and CORS on mobile.
-- Centralizes secrets and networking in one Rust layer.
-- UI stays reusable (same React code) with a different transport.
+## Data flow (high level)
 
-## Migration principle
-Prefer an API boundary that is:
-- Stable for the UI (generic JSON-RPC + events)
-- Secure by default (token never crosses boundary)
-- Flexible (full param/filter support without adding a command per endpoint)
+1. UI calls `auth_login(username, password)`.
+2. Rust logs in, stores the session token internally.
+3. UI calls `betfair_rpc(service, method, params)`.
+4. Rust injects `X-Application` and `X-Authentication` headers and returns the JSON result.
+5. UI initiates streaming; Rust emits updates as Tauri events (e.g. market changes).
