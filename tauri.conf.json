@@ -3,6 +3,13 @@
   "productName": "Betfair Stream API App",
   "version": "1.0.12",
   "identifier": "com.savostin.betfair-stream-app",
+  "bundle": {
+    "icon": [
+      "assets/icon.png",
+      "assets/icon.icns",
+      "assets/icon.ico"
+    ]
+  },
   "build": {
     "devUrl": "http://localhost:5173",
     "frontendDist": "ui/dist"
