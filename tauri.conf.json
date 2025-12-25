@@ -1,0 +1,31 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Betfair Stream API App",
+  "version": "1.0.12",
+  "identifier": "com.savostin.betfair-stream-app",
+  "bundle": {
+    "icon": [
+      "assets/icon.png",
+      "assets/icon.icns",
+      "assets/icon.ico"
+    ]
+  },
+  "build": {
+    "devUrl": "http://localhost:5173",
+    "frontendDist": "ui/dist"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "title": "Betfair Stream App",
+        "width": 1200,
+        "height": 800,
+        "resizable": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  }
+}

@@ -52,7 +52,7 @@ APP_DMG_VOLUME_NAME="${APP_DMG_VOLUME_NAME:-$(_toml_get_app_meta dmg_volume_name
 APP_WINDOWS_PRODUCT_NAME="${APP_WINDOWS_PRODUCT_NAME:-$(_toml_get_app_meta windows_product_name)}"
 
 # Sensible fallbacks (kept consistent with prior defaults).
-APP_DISPLAY_NAME="${APP_DISPLAY_NAME:-Betfair Stream API Proxy}"
-APP_BUNDLE_ID="${APP_BUNDLE_ID:-com.savostin.betfair-stream-proxy}"
+APP_DISPLAY_NAME="${APP_DISPLAY_NAME:-Betfair Stream API App}"
+APP_BUNDLE_ID="${APP_BUNDLE_ID:-com.savostin.betfair-stream-app}"
 APP_DMG_VOLUME_NAME="${APP_DMG_VOLUME_NAME:-$APP_DISPLAY_NAME}"
 APP_WINDOWS_PRODUCT_NAME="${APP_WINDOWS_PRODUCT_NAME:-$APP_DISPLAY_NAME}"

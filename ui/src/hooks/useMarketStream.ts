@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { MarketSnapshot } from '../lib/streamState'
-import { StreamClient, type UiMessage } from '../lib/streamClient'
+import type { UiMessage } from '../lib/streamClient'
+import { TauriStreamClient } from '../lib/streamClientTauri'
 
 export type MarketStreamState = {
   selectedMarketId: string
@@ -19,23 +20,18 @@ export type MarketStreamState = {
 }
 
 export function useMarketStream(args: {
-  wsUrl: string
-  appKey: string
-  sessionToken: string
+  isAuthed: boolean
   onInfo?: (m: UiMessage) => void
   onError?: (m: UiMessage) => void
 }): MarketStreamState {
-  const streamRef = useRef<StreamClient | null>(null)
+  const streamRef = useRef<{ disconnect: () => void; subscribeToMarket: (marketId: string) => void } | null>(null)
   const [selectedMarketId, setSelectedMarketIdState] = useState<string>('')
   const [snapshot, setSnapshot] = useState<MarketSnapshot | null>(null)
 
-  const ensureClient = useCallback((): StreamClient => {
+  const ensureClient = useCallback(() => {
     if (streamRef.current) return streamRef.current
 
-    const client = new StreamClient({
-      wsUrl: args.wsUrl,
-      appKey: args.appKey,
-      sessionToken: args.sessionToken,
+    const client = new TauriStreamClient({
       onSnapshot: (s) => setSnapshot(s),
       onInfo: args.onInfo,
       onError: args.onError,
@@ -43,7 +39,7 @@ export function useMarketStream(args: {
 
     streamRef.current = client
     return client
-  }, [args.appKey, args.onError, args.onInfo, args.sessionToken, args.wsUrl])
+  }, [args.onError, args.onInfo])
 
   const disconnect = useCallback(() => {
     streamRef.current?.disconnect()
@@ -57,12 +53,12 @@ export function useMarketStream(args: {
       setSelectedMarketIdState(marketId)
       setSnapshot(null)
 
-      if (!args.wsUrl || !args.appKey || !args.sessionToken) return
+      if (!args.isAuthed) return
 
       const client = ensureClient()
       client.subscribeToMarket(marketId)
     },
-    [args.appKey, args.sessionToken, args.wsUrl, ensureClient],
+    [args.isAuthed, ensureClient],
   )
 
   useEffect(() => {

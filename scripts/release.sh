@@ -32,6 +32,13 @@ if ! git rev-parse --git-dir >/dev/null 2>&1; then
   exit 1
 fi
 
+BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+if [[ "${BRANCH}" == "HEAD" ]]; then
+  echo "ERROR: detached HEAD; switch to main before releasing" >&2
+  exit 1
+fi
+
+
 # Ensure Cargo.lock matches Cargo.toml before tagging.
 # This prevents CI/release failures due to --locked refusing to update the lockfile.
 if command -v cargo >/dev/null 2>&1; then
