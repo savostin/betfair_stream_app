@@ -12,11 +12,11 @@ import {
   Typography,
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
-import type { MarketCatalogue } from '../../lib/betfair'
-import { formatMoney } from '../../lib/format'
+import type { MarketCatalogue } from '@betfair'
+import { formatMoney } from '@lib/format'
 import { LtpCell } from './cells/LtpCell'
 import { PriceAmountCell } from './cells/PriceAmountCell'
-import { BACK_COLOR, LAY_COLOR } from '../../theme/colors'
+import { BACK_COLOR, LAY_COLOR } from '@theme/colors'
 
 export function MarketTable(props: {
   selectedMarket: MarketCatalogue | null

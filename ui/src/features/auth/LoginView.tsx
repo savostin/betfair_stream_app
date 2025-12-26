@@ -8,6 +8,7 @@ export function LoginView(props: {
   onChangeUsername: (next: string) => void
   onChangePassword: (next: string) => void
   onSubmit: (e: FormEvent) => void
+  isLoading?: boolean
 }): React.ReactNode {
   const { t } = useTranslation(['auth'])
 
@@ -26,6 +27,7 @@ export function LoginView(props: {
               placeholder={t('auth:login.usernamePlaceholder')}
               autoComplete="username"
               fullWidth
+              disabled={props.isLoading}
             />
             <TextField
               label={t('auth:login.passwordLabel')}
@@ -35,8 +37,9 @@ export function LoginView(props: {
               type="password"
               autoComplete="current-password"
               fullWidth
+              disabled={props.isLoading}
             />
-            <Button type="submit" variant="contained">
+            <Button type="submit" variant="contained" disabled={props.isLoading}>
               {t('auth:login.submit')}
             </Button>
           </Stack>

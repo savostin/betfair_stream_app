@@ -1,10 +1,10 @@
 import { useMemo } from 'react'
 import type { AccountFunds, MarketCatalogue } from '@betfair'
-import { useAppSnackbar } from '../hooks/useAppSnackbar'
-import { useFunds } from '../hooks/useFunds'
-import { useMarkets } from '../hooks/useMarkets'
-import { useMarketStream } from '../hooks/useMarketStream'
-import { useSession } from '../hooks/useSession'
+import { useAppSnackbar } from '@hooks/useAppSnackbar'
+import { useFunds } from '@hooks/useFunds'
+import { useMarkets } from '@hooks/useMarkets'
+import { useMarketStream } from '@hooks/useMarketStream'
+import { useSession } from '@hooks/useSession'
 
 export type AppModel = {
   // Session
@@ -70,8 +70,12 @@ export function useAppModel(): AppModel {
   }, [markets.markets, stream.selectedMarketId])
 
   async function login(args: { username: string; password: string }): Promise<void> {
-    await session.login(args)
-    snackbar.showInfo('auth:toast.loggedIn')
+    try {
+      await session.login(args)
+    } catch (e) {
+      snackbar.showFromUnknownError(e)
+      throw e
+    }
   }
 
   function logout(): void {

@@ -17,13 +17,33 @@ export type {
   MarketCatalogueRunner,
   MarketCatalogue,
   ListMarketCatalogueRequest,
+  ItemDescription,
+  ClearedOrderSummary,
+  ClearedOrderSummaryReport,
 } from './types/betting'
 
 // Account API (general)
 export { getAccountFunds, getAccountDetails } from './api/account'
 
 // Betting API
-export { listMarketCatalogue } from './api/betting'
+export {
+  listMarketCatalogue,
+  listEventTypes,
+  listCompetitions,
+  listTimeRanges,
+  listEvents,
+  listMarketTypes,
+  listCountries,
+  listVenues,
+  listMarketBook,
+  listRunnerBook,
+  listCurrentOrders,
+  listClearedOrders,
+  placeOrders,
+  cancelOrders,
+  replaceOrders,
+  updateOrders,
+} from './api/betting'
 export { listNextHorseWinMarkets } from './betting'
 // Auth
-export { betfairLogin } from '../betfair'
+export { betfairLogin } from '@lib/betfair'

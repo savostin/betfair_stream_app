@@ -1,5 +1,5 @@
 import { Paper, Stack } from '@mui/material'
-import type { MarketCatalogue } from '../../lib/betfair'
+import type { MarketCatalogue } from '@betfair'
 import { MarketList } from './MarketList'
 import { MarketTable } from './MarketTable'
 

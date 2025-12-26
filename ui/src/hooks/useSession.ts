@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { betfairLogin } from '@betfair'
-import { UiError } from '../errors/UiError'
-import { tauriInvoke } from '../lib/tauri'
+import { UiError } from '@errors/UiError'
+import { tauriInvoke } from '@lib/tauri'
 
 export type SessionState = {
   isAuthed: boolean

@@ -6,11 +6,17 @@ export function LoginController(props: {
 }): React.ReactNode {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
   async function onSubmit(e: FormEvent): Promise<void> {
     e.preventDefault()
-    await props.login({ username, password })
-    setPassword('')
+    setIsLoading(true)
+    try {
+      await props.login({ username, password })
+      setPassword('')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -20,6 +26,7 @@ export function LoginController(props: {
       onChangeUsername={setUsername}
       onChangePassword={setPassword}
       onSubmit={onSubmit}
+      isLoading={isLoading}
     />
   )
 }

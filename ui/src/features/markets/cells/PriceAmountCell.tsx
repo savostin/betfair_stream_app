@@ -1,6 +1,6 @@
 import { Box, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
-import { formatPrice } from '../../../lib/price'
+import { formatPrice } from '@lib/price'
 
 export function PriceAmountCell(props: { price?: number; amount?: number; formatAmount: (n: number) => string }): React.ReactNode {
   const { t } = useTranslation('common')

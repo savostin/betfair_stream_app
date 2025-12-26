@@ -1,12 +1,12 @@
 import { Box, Container } from '@mui/material'
 import { useState } from 'react'
 
-import { AppShell } from './app/AppShell'
-import { AuthGate } from './app/AuthGate'
-import { useAppModel } from './app/useAppModel'
-import { LoginController } from './features/auth/LoginController'
-import { MarketsView } from './features/markets/MarketsView'
-import { SettingsPage } from './pages/SettingsPage'
+import { AppShell } from '@app/AppShell'
+import { AuthGate } from '@app/AuthGate'
+import { useAppModel } from '@app/useAppModel'
+import { LoginController } from '@features/auth/LoginController'
+import { MarketsView } from '@features/markets/MarketsView'
+import { SettingsPage } from '@pages/SettingsPage'
 
 function App() {
   const model = useAppModel()

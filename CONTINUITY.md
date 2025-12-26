@@ -32,7 +32,7 @@
 
 ## State:
 - Now:
-  - (No active work)
+  - Completed comprehensive alias cleanup across the codebase using @lib, @errors, @betfair, @hooks, @features, @theme, @pages, @app.
 
 - Done:
   - DMG packaging script and workflow wiring.
@@ -111,7 +111,11 @@
     - ✅ Currency symbols threaded to matched volume and amounts in markets table.
 
 - Now:
-  - (No active work)
+  - Implemented additional core Betfair types in `ui/src/lib/betfair/types/{common,betting}.ts` to support browse, market book, and orders APIs.
+  - Implemented `listMarketCatalogue` and all remaining betting general wrappers using `betfairInvokeSafe` (`listEventTypes`, `listCompetitions`, `listTimeRanges`, `listEvents`, `listMarketTypes`, `listCountries`, `listVenues`, `listMarketBook`, `listRunnerBook`, `listCurrentOrders`, `listClearedOrders`, `placeOrders`, `cancelOrders`, `replaceOrders`, `updateOrders`).
+  - Added typed models for cleared orders and updated `listClearedOrders` to return `ClearedOrderSummaryReport`.
+  - Re-exported new methods from `ui/src/lib/betfair/index.ts`.
+  - UI build succeeded (`npm --prefix ui run build`).
   - Commit the CI/release workflow adjustments (if uncommitted), then tag and publish a release.
 
 ## Open questions (UNCONFIRMED if needed):
@@ -124,6 +128,9 @@
 - scripts/app-config.sh
 - README.md
 - ui/ (React/Vite subproject)
+- ui/src/lib/betfair/types/{common,betting}.ts
+- ui/src/lib/betfair/api/{account,betting}.ts
+- ui/src/lib/betfair/index.ts
 - src/ (Tauri app)
 - tauri.conf.json
 

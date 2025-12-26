@@ -1,7 +1,7 @@
 import { CssBaseline, ThemeProvider } from '@mui/material'
 import { useMemo, type PropsWithChildren } from 'react'
-import { ColorModeProvider, useColorMode } from '../theme/ColorModeProvider'
-import { createAppTheme } from '../theme/createAppTheme'
+import { ColorModeProvider, useColorMode } from '@theme/ColorModeProvider'
+import { createAppTheme } from '@theme/createAppTheme'
 
 function MuiThemeProviders(props: PropsWithChildren): React.ReactNode {
   const { mode } = useColorMode()

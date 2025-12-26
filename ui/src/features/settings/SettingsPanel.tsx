@@ -1,7 +1,7 @@
 import { Paper, Stack, TextField, Typography } from '@mui/material'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { getFundsRefreshInterval, setFundsRefreshInterval } from '../../lib/storage'
+import { getFundsRefreshInterval, setFundsRefreshInterval } from '@lib/storage'
 import { LanguageSelect } from './LanguageSelect'
 import { ThemeModeToggle } from './ThemeModeToggle'
 

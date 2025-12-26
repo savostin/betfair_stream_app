@@ -1,6 +1,6 @@
 import { Button } from '@mui/material'
 import { useTranslation } from 'react-i18next'
-import { useColorMode } from '../../theme/ColorModeProvider'
+import { useColorMode } from '@theme/ColorModeProvider'
 
 export function ThemeModeToggle(props: { variant?: 'text' | 'outlined' | 'contained' } = {}): React.ReactNode {
   const { variant = 'outlined' } = props

@@ -5,7 +5,12 @@
       "@lib/*": ["lib/*"],
       "@errors/*": ["errors/*"],
       "@betfair/*": ["lib/betfair/*"],
-      "@betfair": ["lib/betfair/index.ts"]
+      "@betfair": ["lib/betfair/index.ts"],
+      "@hooks/*": ["hooks/*"],
+      "@features/*": ["features/*"],
+      "@theme/*": ["theme/*"],
+      "@pages/*": ["pages/*"],
+      "@app/*": ["app/*"]
     },
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "target": "ES2022",

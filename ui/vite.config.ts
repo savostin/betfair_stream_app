@@ -10,6 +10,11 @@ export default defineConfig({
       { find: '@lib', replacement: path.resolve(__dirname, 'src/lib') },
       { find: '@errors', replacement: path.resolve(__dirname, 'src/errors') },
       { find: '@betfair', replacement: path.resolve(__dirname, 'src/lib/betfair') },
+      { find: '@hooks', replacement: path.resolve(__dirname, 'src/hooks') },
+      { find: '@features', replacement: path.resolve(__dirname, 'src/features') },
+      { find: '@theme', replacement: path.resolve(__dirname, 'src/theme') },
+      { find: '@pages', replacement: path.resolve(__dirname, 'src/pages') },
+      { find: '@app', replacement: path.resolve(__dirname, 'src/app') },
     ],
   },
 })

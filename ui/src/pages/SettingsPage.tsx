@@ -1,6 +1,6 @@
 import { Box, Stack, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
-import { SettingsPanel } from '../features/settings/SettingsPanel'
+import { SettingsPanel } from '@features/settings/SettingsPanel'
 
 export function SettingsPage(): React.ReactNode {
   const { t } = useTranslation('settings')
