@@ -9,6 +9,13 @@ export type {
   GetAccountFundsRequest,
   AccountFunds,
   AccountDetails,
+  DeveloperAppKey,
+  GetDeveloperAppKeysResponse,
+  VendorClientIdResponse,
+  CurrencyRate,
+  ListCurrencyRatesResponse,
+  StatementItem,
+  GetAccountStatementResponse,
 } from './types/account'
 export type {
   MarketFilter,
@@ -23,7 +30,7 @@ export type {
 } from './types/betting'
 
 // Account API (general)
-export { getAccountFunds, getAccountDetails } from './api/account'
+export { getAccountFunds, getAccountDetails, getDeveloperAppKeys, getVendorClientId, listCurrencyRates, getAccountStatement } from './api/account'
 
 // Betting API
 export {

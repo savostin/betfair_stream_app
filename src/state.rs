@@ -76,6 +76,8 @@ fn build_allowlist_account() -> HashSet<String> {
         "getAccountDetails",
         "getDeveloperAppKeys",
         "getVendorClientId",
+        "listCurrencyRates",
+        "getAccountStatement",
     ]
     .into_iter()
     .map(|s| s.to_string())
