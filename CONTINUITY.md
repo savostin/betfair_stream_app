@@ -31,6 +31,9 @@
   - AppKey embedded in Rust; `.env` supported for local dev.
 
 ## State:
+- Now:
+  - (No active work)
+
 - Done:
   - DMG packaging script and workflow wiring.
   - Linux release archive naming includes version from tag and uses app display name (sanitized) as the filename base.
@@ -75,15 +78,15 @@
   - Restored the repo to a clean, non-debug state at `dev` HEAD (`dc05193`) after identifying the root cause outside the code; removed local debug/duplicate client changes and verified `cargo build` + `npm --prefix ui run build`.
 - Confirmed Betfair RPC `ANGX-0007` root cause was a stale/dummy AppKey in the environment; runtime `.env` loading and precedence are now robust (crate-root `.env`, `.env` overrides sticky exported values).
 - Removed Tauri `beforeBuildCommand`/`beforeDevCommand` hooks and moved UI production build into `build.rs` for release builds (opt-out via `TAURI_SKIP_UI_BUILD=1`).
+  - Implemented account funds display in app header with configurable periodic refresh (minimum 15 seconds, default 30 seconds).
+  - Added `get_account_funds` Tauri command (calls `AccountAPING/v1.0/getAccountFunds`).
+  - Created `useFunds` hook with periodic refresh based on user-configurable interval in settings.
+  - Funds available to bet displayed as a Chip in the AppBar (£ formatted with 2 decimal places).
+  - Settings panel includes TextField for configuring funds refresh interval with minimum 15 seconds validation.
+  - Verified builds: `cargo build` and `npm --prefix ui run build` both succeed.
+
 - Now:
-  - Audit Windows/Linux CI + release workflows after the Tauri-only root-layout switch (deps, artifact collection, redundant UI builds).
-  - Validate release workflow artifact collection paths and shell compatibility on all OS runners (macOS/Windows/Linux).
-  - Workflow tweaks (committed):
-    - CI skips `build.rs` UI build during `cargo build --release` via `TAURI_SKIP_UI_BUILD=1`.
-    - Release fails fast if `BETFAIR_APP_KEY` secret is missing/empty (prevents shipping bundles without embedded AppKey).
-  - Local validation: `TAURI_SKIP_UI_BUILD=1 cargo build --release --locked` succeeds on macOS.
-- Next:
-  - Make any minimal workflow fixes needed for Windows/Linux bundling.
+  - (No active work)
   - Commit the CI/release workflow adjustments (if uncommitted), then tag and publish a release.
 
 ## Open questions (UNCONFIRMED if needed):

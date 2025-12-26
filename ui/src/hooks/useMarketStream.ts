@@ -14,6 +14,7 @@ export type MarketStreamState = {
       back: Array<{ price: number; size: number }>
       lay: Array<{ price: number; size: number }>
       ltp?: number
+      tv?: number
     }
   >
   disconnect: () => void
@@ -75,6 +76,7 @@ export function useMarketStream(args: {
         back: Array<{ price: number; size: number }>
         lay: Array<{ price: number; size: number }>
         ltp?: number
+        tv?: number
       }
     >()
 
@@ -82,7 +84,7 @@ export function useMarketStream(args: {
     for (const r of snapshot.runners) {
       const back = (r.batb ?? []).slice(0, 3).map((x) => ({ price: x.price, size: x.size }))
       const lay = (r.batl ?? []).slice(0, 3).map((x) => ({ price: x.price, size: x.size }))
-      map.set(r.selectionId, { back, lay, ltp: r.ltp })
+      map.set(r.selectionId, { back, lay, ltp: r.ltp, tv: r.tv })
     }
 
     return map

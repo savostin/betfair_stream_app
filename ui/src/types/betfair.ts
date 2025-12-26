@@ -30,3 +30,13 @@ export type MarketCatalogue = {
 }
 
 export type ListMarketCatalogueResponse = MarketCatalogue[]
+
+export type AccountFunds = {
+  availableToBetBalance?: number
+  exposure?: number
+  retainedCommission?: number
+  exposureLimit?: number
+  discountRate?: number
+  pointsBalance?: number
+  wallet?: string
+}

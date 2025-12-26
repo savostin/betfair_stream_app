@@ -1,6 +1,8 @@
 {
   "panel": {
-    "title": "Ajustes"
+    "title": "Configuración",
+    "fundsRefreshInterval": "Actualización de fondos (segundos)",
+    "fundsRefreshIntervalHelp": "Mínimo 15 segundos"
   },
   "theme": {
     "label": "Tema",

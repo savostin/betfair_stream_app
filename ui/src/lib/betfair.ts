@@ -1,4 +1,4 @@
-import type { ListMarketCatalogueResponse } from '../types/betfair'
+import type { AccountFunds, ListMarketCatalogueResponse } from '../types/betfair'
 import { UiError } from '../errors/UiError'
 import { tauriInvoke } from './tauri'
 
@@ -93,6 +93,16 @@ export async function listNextHorseWinMarkets(): Promise<ListMarketCatalogueResp
     return await tauriInvoke<ListMarketCatalogueResponse>('betfair_rpc', {
       args: { service: 'betting', method: 'listMarketCatalogue', params: requestBody },
     })
+  } catch (e) {
+    const extracted = extractInvokeUiError(e)
+    if (extracted) throw new UiError(extracted)
+    throw e
+  }
+}
+
+export async function getAccountFunds(): Promise<AccountFunds> {
+  try {
+    return await tauriInvoke<AccountFunds>('get_account_funds')
   } catch (e) {
     const extracted = extractInvokeUiError(e)
     if (extracted) throw new UiError(extracted)

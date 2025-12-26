@@ -26,6 +26,7 @@ function App() {
       onCloseSettings={page === 'settings' ? () => setPage('main') : undefined}
       snackbar={model.snackbar}
       onCloseSnackbar={model.clearSnackbar}
+      funds={model.funds}
     >
       <Container
         maxWidth={false}

@@ -16,6 +16,7 @@ export function MarketsView(props: {
       back: Array<{ price: number; size: number }>
       lay: Array<{ price: number; size: number }>
       ltp?: number
+      tv?: number
     }
   >
   snapshotConnected: boolean

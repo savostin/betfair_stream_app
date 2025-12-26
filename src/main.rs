@@ -68,6 +68,7 @@ fn main() {
             commands::auth::auth_status,
             commands::auth::auth_login,
             commands::auth::auth_logout,
+            commands::account::get_account_funds,
             commands::rpc::betfair_rpc,
             commands::stream::stream_connect,
             commands::stream::stream_send,

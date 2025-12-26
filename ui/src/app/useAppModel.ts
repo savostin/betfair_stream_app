@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
-import type { MarketCatalogue } from '../types/betfair'
+import type { AccountFunds, MarketCatalogue } from '../types/betfair'
 import { useAppSnackbar } from '../hooks/useAppSnackbar'
+import { useFunds } from '../hooks/useFunds'
 import { useMarkets } from '../hooks/useMarkets'
 import { useMarketStream } from '../hooks/useMarketStream'
 import { useSession } from '../hooks/useSession'
@@ -10,6 +11,11 @@ export type AppModel = {
   isAuthed: boolean
   login: (args: { username: string; password: string }) => Promise<void>
   logout: () => void
+
+  // Funds
+  funds: AccountFunds | null
+  fundsLoading: boolean
+  refreshFunds: () => Promise<void>
 
   // Markets + selection
   markets: MarketCatalogue[]
@@ -26,6 +32,7 @@ export type AppModel = {
       back: Array<{ price: number; size: number }>
       lay: Array<{ price: number; size: number }>
       ltp?: number
+      tv?: number
     }
   >
   snapshotConnected: boolean
@@ -39,6 +46,11 @@ export type AppModel = {
 export function useAppModel(): AppModel {
   const snackbar = useAppSnackbar()
   const session = useSession()
+
+  const funds = useFunds({
+    isAuthed: session.isAuthed,
+    onError: snackbar.showFromUnknownError,
+  })
 
   const markets = useMarkets({
     isAuthed: session.isAuthed,
@@ -72,6 +84,10 @@ export function useAppModel(): AppModel {
     isAuthed: session.isAuthed,
     login,
     logout,
+
+    funds: funds.funds,
+    fundsLoading: funds.fundsLoading,
+    refreshFunds: funds.refreshFunds,
 
     markets: markets.markets,
     marketsLoading: markets.marketsLoading,

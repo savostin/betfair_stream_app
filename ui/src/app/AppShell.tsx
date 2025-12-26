@@ -3,6 +3,7 @@ import {
   AppBar,
   Box,
   Button,
+  Chip,
   Snackbar,
   Stack,
   Toolbar,
@@ -11,6 +12,8 @@ import {
 } from '@mui/material'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { formatMoney } from '../lib/format'
+import type { AccountFunds } from '../types/betfair'
 import { LanguageSelect } from '../features/settings/LanguageSelect'
 import { ThemeModeToggle } from '../features/settings/ThemeModeToggle'
 
@@ -29,6 +32,7 @@ export function AppShell(props: {
   onCloseSettings?: () => void
   snackbar: SnackbarState
   onCloseSnackbar: () => void
+  funds: AccountFunds | null
   children: React.ReactNode
 }): React.ReactNode {
   const { t } = useTranslation(['common', 'auth', 'settings'])
@@ -54,6 +58,15 @@ export function AppShell(props: {
           </Typography>
 
           <Stack direction="row" spacing={1} alignItems="center">
+            {props.isAuthed && props.funds?.availableToBetBalance != null ? (
+              <Chip
+                label={`£${formatMoney(props.funds.availableToBetBalance, '0.00')}`}
+                size="small"
+                color="primary"
+                variant="outlined"
+              />
+            ) : null}
+
             {props.isSettingsPage && props.onCloseSettings ? (
               <Button color="inherit" onClick={props.onCloseSettings}>
                 {t('common:actions.back')}

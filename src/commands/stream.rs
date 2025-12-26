@@ -12,6 +12,18 @@ pub async fn stream_connect(app: AppHandle, state: State<'_, AppState>) -> Resul
     {
         let guard = state.stream.read().await;
         if guard.is_some() {
+            // The UI may reload while the Rust-side stream connection is still alive.
+            // In that case, re-emit a synthetic auth success status so the UI can
+            // transition to authenticated state and send market subscriptions.
+            let _ = app.emit(
+                EVENT_STREAM_LINE,
+                serde_json::json!({
+                    "op": "status",
+                    "id": 1,
+                    "statusCode": "SUCCESS"
+                })
+                .to_string(),
+            );
             return Ok(());
         }
     }

@@ -1,6 +1,8 @@
 {
   "panel": {
-    "title": "Settings"
+    "title": "Settings",
+    "fundsRefreshInterval": "Funds Refresh (seconds)",
+    "fundsRefreshIntervalHelp": "Minimum 15 seconds"
   },
   "theme": {
     "label": "Theme",
