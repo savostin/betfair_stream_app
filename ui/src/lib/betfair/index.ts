@@ -19,8 +19,11 @@ export type {
   ListMarketCatalogueRequest,
 } from './types/betting'
 
-// Account API
-export { getAccountFunds, getAccountDetails } from './account'
+// Account API (general)
+export { getAccountFunds, getAccountDetails } from './api/account'
 
 // Betting API
-export { listMarketCatalogue, listNextHorseWinMarkets } from './betting'
+export { listMarketCatalogue } from './api/betting'
+export { listNextHorseWinMarkets } from './betting'
+// Auth
+export { betfairLogin } from '../betfair'

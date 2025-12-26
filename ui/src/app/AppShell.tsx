@@ -13,7 +13,7 @@ import {
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { formatMoney, getCurrencySymbol } from '../lib/format'
-import type { AccountFunds } from '../lib/betfair'
+import type { AccountFunds } from '@betfair'
 import { LanguageSelect } from '../features/settings/LanguageSelect'
 import { ThemeModeToggle } from '../features/settings/ThemeModeToggle'
 

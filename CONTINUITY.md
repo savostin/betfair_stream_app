@@ -93,6 +93,23 @@
   - Updated all imports throughout codebase to use new modular structure.
   - Verified builds: `cargo build` and `npm --prefix ui run build` both succeed.
 
+  ## Key decisions (update):
+  - Separated general Betfair API methods into `ui/src/lib/betfair/api/` (`account.ts`, `betting.ts`).
+  - Kept custom convenience wrappers in `ui/src/lib/betfair/` (e.g., `listNextHorseWinMarkets`).
+  - Central re-exports in `ui/src/lib/betfair/index.ts` now export general methods from `api/` and custom wrappers from top-level.
+
+  ## State (delta):
+  - Done:
+    - ✅ Created `ui/src/lib/betfair/api/account.ts` and `api/betting.ts` with typed general methods.
+    - ✅ Updated `ui/src/lib/betfair/index.ts` to re-export from `api/` and custom.
+    - ✅ Refactored `ui/src/lib/betfair/betting.ts` to only hold custom helpers and import general methods from `api/`.
+    - ✅ Build verified after separation (npm run build ✓).
+    - ✅ Added `ui/src/lib/betfair/invoke.ts` with `betfairInvoke<T>()` to wrap `tauriInvoke('betfair_rpc', ...)` and refactored API calls to use it (reduces duplication and centralizes RPC command usage).
+    - ✅ Extended invoke helper with `betfairInvokeSafe<T>()` that centralizes error extraction (`extractInvokeUiError`) and throws `UiError` for structured errors; updated API methods to use the safe wrapper (removed local try/catch duplication).
+    - ✅ Removed legacy duplicated account API in `ui/src/lib/betfair/account.ts` and replaced with a thin re-export to `ui/src/lib/betfair/api/account.ts`.
+    - ✅ Added TS/Vite path aliases (`@lib`, `@errors`, `@betfair`) and refactored imports to use them.
+    - ✅ Currency symbols threaded to matched volume and amounts in markets table.
+
 - Now:
   - (No active work)
   - Commit the CI/release workflow adjustments (if uncommitted), then tag and publish a release.

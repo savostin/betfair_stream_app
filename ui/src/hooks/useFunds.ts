@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import type { AccountDetails, AccountFunds } from '../lib/betfair'
-import { getAccountDetails, getAccountFunds } from '../lib/betfair'
+import type { AccountDetails, AccountFunds } from '@betfair'
+import { getAccountDetails, getAccountFunds } from '@betfair'
 import { getFundsRefreshInterval } from '../lib/storage'
 
 export type FundsState = {

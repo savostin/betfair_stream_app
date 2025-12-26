@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import type { AccountFunds, MarketCatalogue } from '../lib/betfair'
+import type { AccountFunds, MarketCatalogue } from '@betfair'
 import { useAppSnackbar } from '../hooks/useAppSnackbar'
 import { useFunds } from '../hooks/useFunds'
 import { useMarkets } from '../hooks/useMarkets'
