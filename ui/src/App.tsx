@@ -61,6 +61,7 @@ function App() {
                   onSelectMarket={model.setSelectedMarketId}
                   bestBackLayBySelectionId={model.bestBackLayBySelectionId}
                   snapshotConnected={model.snapshotConnected}
+                  marketTradedVolume={model.marketTradedVolume}
                 />
               }
             />

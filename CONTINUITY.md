@@ -72,6 +72,7 @@
   - Fixed release workflow to build `ui/dist` before `cargo tauri build` (Tauri validates `frontendDist` early); bundling step sets `TAURI_SKIP_UI_BUILD=1` to avoid double-building.
   - Fixed release workflow artifact collection: replaced non-portable `**` globs with a `find` loop and fail-fast when no bundle outputs are produced (prevents empty `dist/*` uploads).
   - Fixed CI clippy failures (`len()>0` and `manual_inspect`) and committed Cargo.lock update.
+  - Restored the repo to a clean, non-debug state at `dev` HEAD (`dc05193`) after identifying the root cause outside the code; removed local debug/duplicate client changes and verified `cargo build` + `npm --prefix ui run build`.
 - Confirmed Betfair RPC `ANGX-0007` root cause was a stale/dummy AppKey in the environment; runtime `.env` loading and precedence are now robust (crate-root `.env`, `.env` overrides sticky exported values).
 - Removed Tauri `beforeBuildCommand`/`beforeDevCommand` hooks and moved UI production build into `build.rs` for release builds (opt-out via `TAURI_SKIP_UI_BUILD=1`).
 - Now:

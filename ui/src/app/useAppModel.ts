@@ -29,6 +29,7 @@ export type AppModel = {
     }
   >
   snapshotConnected: boolean
+  marketTradedVolume: number | null
 
   // Notifications
   snackbar: ReturnType<typeof useAppSnackbar>['snackbar']
@@ -81,6 +82,7 @@ export function useAppModel(): AppModel {
 
     bestBackLayBySelectionId: stream.bestBackLayBySelectionId,
     snapshotConnected: stream.snapshotConnected,
+    marketTradedVolume: stream.marketTradedVolume,
 
     snackbar: snackbar.snackbar,
     clearSnackbar: snackbar.clearSnackbar,

@@ -77,8 +77,6 @@ pub async fn stream_connect(app: AppHandle, state: State<'_, AppState>) -> Resul
         while let Some(msg) = stream.next().await {
             match msg {
                 Ok(line) => {
-                    // Keep this as debug-ish info: it's helpful during bring-up.
-                    info!(n = line.len(), "stream_in");
                     let _ = app.emit(EVENT_STREAM_LINE, line);
                 }
                 Err(_) => {

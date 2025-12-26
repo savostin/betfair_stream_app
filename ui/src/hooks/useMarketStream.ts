@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { MarketSnapshot } from '../lib/streamState'
-import type { UiMessage } from '../lib/streamClient'
-import { TauriStreamClient } from '../lib/streamClientTauri'
+import { TauriStreamClient, type UiMessage } from '../lib/stream'
 
 export type MarketStreamState = {
   selectedMarketId: string
   setSelectedMarketId: (marketId: string) => void
   snapshot: MarketSnapshot | null
   snapshotConnected: boolean
+  marketTradedVolume: number | null
   bestBackLayBySelectionId: Map<
     number,
     {
@@ -93,6 +93,7 @@ export function useMarketStream(args: {
     setSelectedMarketId,
     snapshot,
     snapshotConnected: Boolean(snapshot),
+    marketTradedVolume: typeof snapshot?.tradedVolume === 'number' ? snapshot.tradedVolume : null,
     bestBackLayBySelectionId,
     disconnect,
   }

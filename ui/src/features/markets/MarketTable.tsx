@@ -28,6 +28,7 @@ export function MarketTable(props: {
     }
   >
   snapshotConnected: boolean
+  marketTradedVolume: number | null
 }): React.ReactNode {
   const theme = useTheme()
   const { t } = useTranslation(['markets', 'common'])
@@ -49,6 +50,7 @@ export function MarketTable(props: {
   }
 
   const selectedMarket = props.selectedMarket
+  const matchedVolume = props.marketTradedVolume ?? selectedMarket.totalMatched
 
   return (
     <>
@@ -75,7 +77,7 @@ export function MarketTable(props: {
 
         <Box sx={{ textAlign: { xs: 'left', sm: 'right' } }}>
           <Typography variant="caption" color="text.secondary" display="block">
-            {t('markets:meta.matched', { amount: formatMoney(selectedMarket.totalMatched, dash) })}
+            {t('markets:meta.matched', { amount: formatMoney(matchedVolume, dash) })}
           </Typography>
         </Box>
       </Stack>

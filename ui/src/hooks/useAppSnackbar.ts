@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { SnackbarState } from '../app/AppShell'
 import { isUiError } from '../errors/UiError'
-import type { UiMessage } from '../lib/streamClient'
+import type { UiMessage } from '../lib/stream'
 
 export type UseAppSnackbar = {
   snackbar: SnackbarState

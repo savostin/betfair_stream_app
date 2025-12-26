@@ -19,6 +19,7 @@ export function MarketsView(props: {
     }
   >
   snapshotConnected: boolean
+  marketTradedVolume: number | null
 }): React.ReactNode {
   return (
     <Stack spacing={1.5} sx={{ flex: 1, minHeight: 0 }}>
@@ -36,6 +37,7 @@ export function MarketsView(props: {
             selectedMarket={props.selectedMarket}
             bestBackLayBySelectionId={props.bestBackLayBySelectionId}
             snapshotConnected={props.snapshotConnected}
+            marketTradedVolume={props.marketTradedVolume}
           />
         </Paper>
       </Stack>

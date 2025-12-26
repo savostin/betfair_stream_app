@@ -15,6 +15,7 @@ export type StreamMcmMessage = {
 export type MarketChange = {
   id?: string
   img?: boolean
+  tv?: number
   marketDefinition?: unknown
   rc?: RunnerChange[]
 }
@@ -41,6 +42,7 @@ export type MarketState = {
   marketId: string
   publishTime?: number
   clk?: string
+  tradedVolume?: number
   marketDefinition?: unknown
   runners: Map<number, RunnerState>
 }
@@ -49,6 +51,7 @@ export type MarketSnapshot = {
   marketId: string
   publishTime?: number
   clk?: string
+  tradedVolume?: number
   marketDefinition?: unknown
   runners: Array<{
     selectionId: number
@@ -118,6 +121,7 @@ export function applyMcm(
 
   if (typeof msg.pt === 'number') next.publishTime = msg.pt
   if (typeof msg.clk === 'string') next.clk = msg.clk
+  if (typeof marketChange.tv === 'number') next.tradedVolume = marketChange.tv
   if (marketChange.marketDefinition !== undefined) {
     next.marketDefinition = marketChange.marketDefinition
   }
@@ -151,10 +155,16 @@ export function applyMcm(
 }
 
 export function toSnapshot(state: MarketState): MarketSnapshot {
+  const tradedVolume =
+    typeof state.tradedVolume === 'number'
+      ? state.tradedVolume
+      : Array.from(state.runners.values()).reduce((acc, r) => acc + (typeof r.tv === 'number' ? r.tv : 0), 0)
+
   return {
     marketId: state.marketId,
     publishTime: state.publishTime,
     clk: state.clk,
+    tradedVolume,
     marketDefinition: state.marketDefinition,
     runners: Array.from(state.runners.values())
       .sort((a, b) => a.selectionId - b.selectionId)
