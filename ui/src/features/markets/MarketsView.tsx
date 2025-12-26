@@ -1,5 +1,5 @@
 import { Paper, Stack } from '@mui/material'
-import type { MarketCatalogue } from '../../types/betfair'
+import type { MarketCatalogue } from '../../lib/betfair'
 import { MarketList } from './MarketList'
 import { MarketTable } from './MarketTable'
 
@@ -21,6 +21,7 @@ export function MarketsView(props: {
   >
   snapshotConnected: boolean
   marketTradedVolume: number | null
+  accountCurrency: string | null
 }): React.ReactNode {
   return (
     <Stack spacing={1.5} sx={{ flex: 1, minHeight: 0 }}>
@@ -39,6 +40,7 @@ export function MarketsView(props: {
             bestBackLayBySelectionId={props.bestBackLayBySelectionId}
             snapshotConnected={props.snapshotConnected}
             marketTradedVolume={props.marketTradedVolume}
+            accountCurrency={props.accountCurrency}
           />
         </Paper>
       </Stack>

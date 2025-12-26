@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { MarketCatalogue } from '../types/betfair'
+import type { MarketCatalogue } from '../lib/betfair'
 import { listNextHorseWinMarkets } from '../lib/betfair'
 
 export type MarketsState = {

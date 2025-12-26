@@ -40,3 +40,15 @@ export type AccountFunds = {
   pointsBalance?: number
   wallet?: string
 }
+
+export type AccountDetails = {
+  currencyCode?: string
+  firstName?: string
+  lastName?: string
+  localeCode?: string
+  region?: string
+  timezone?: string
+  discountRate?: number
+  pointsBalance?: number
+  countryCode?: string
+}

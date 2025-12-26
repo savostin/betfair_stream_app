@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
-import type { AccountFunds } from '../types/betfair'
-import { getAccountFunds } from '../lib/betfair'
+import type { AccountDetails, AccountFunds } from '../lib/betfair'
+import { getAccountDetails, getAccountFunds } from '../lib/betfair'
 import { getFundsRefreshInterval } from '../lib/storage'
 
 export type FundsState = {
   funds: AccountFunds | null
+  accountDetails: AccountDetails | null
   fundsLoading: boolean
   refreshFunds: () => Promise<void>
 }
@@ -17,22 +18,29 @@ export function useFunds({
   onError?: (e: unknown) => void
 }): FundsState {
   const [funds, setFunds] = useState<AccountFunds | null>(null)
+  const [accountDetails, setAccountDetails] = useState<AccountDetails | null>(null)
   const [fundsLoading, setFundsLoading] = useState(false)
   const [refreshInterval, setRefreshInterval] = useState(() => getFundsRefreshInterval())
 
   const refreshFunds = useCallback(async () => {
     if (!isAuthed) {
       setFunds(null)
+      setAccountDetails(null)
       return
     }
 
     setFundsLoading(true)
     try {
-      const result = await getAccountFunds()
-      setFunds(result)
+      const [fundsResult, detailsResult] = await Promise.all([
+        getAccountFunds(),
+        getAccountDetails(),
+      ])
+      setFunds(fundsResult)
+      setAccountDetails(detailsResult)
     } catch (e) {
       onError?.(e)
       setFunds(null)
+      setAccountDetails(null)
     } finally {
       setFundsLoading(false)
     }
@@ -74,6 +82,7 @@ export function useFunds({
 
   return {
     funds,
+    accountDetails,
     fundsLoading,
     refreshFunds,
   }

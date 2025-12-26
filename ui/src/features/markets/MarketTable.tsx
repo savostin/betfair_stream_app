@@ -12,7 +12,7 @@ import {
   Typography,
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
-import type { MarketCatalogue } from '../../types/betfair'
+import type { MarketCatalogue } from '../../lib/betfair'
 import { formatMoney } from '../../lib/format'
 import { LtpCell } from './cells/LtpCell'
 import { PriceAmountCell } from './cells/PriceAmountCell'
@@ -31,12 +31,13 @@ export function MarketTable(props: {
   >
   snapshotConnected: boolean
   marketTradedVolume: number | null
+  accountCurrency: string | null
 }): React.ReactNode {
   const theme = useTheme()
   const { t } = useTranslation(['markets', 'common'])
 
   const dash = t('common:placeholder.dash')
-  const formatAmount = (n: number) => formatMoney(n, dash)
+  const formatAmount = (n: number) => formatMoney(n, dash, props.accountCurrency ?? undefined)
 
   if (!props.selectedMarket) {
     return (
@@ -85,7 +86,7 @@ export function MarketTable(props: {
 
         <Box sx={{ textAlign: { xs: 'left', sm: 'right' } }}>
           <Typography variant="caption" color="text.secondary" display="block">
-            {t('markets:meta.matched', { amount: formatMoney(matchedVolume, dash) })}
+            {t('markets:meta.matched', { amount: formatMoney(matchedVolume, dash, props.accountCurrency ?? undefined) })}
           </Typography>
         </Box>
       </Stack>

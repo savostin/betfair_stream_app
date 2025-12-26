@@ -1,5 +1,5 @@
 import { Box, Button, Divider, Paper, Stack, Typography } from '@mui/material'
-import type { MarketCatalogue } from '../../types/betfair'
+import type { MarketCatalogue } from '../../lib/betfair'
 import { useTranslation } from 'react-i18next'
 
 export function MarketList(props: {

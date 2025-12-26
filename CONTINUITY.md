@@ -80,10 +80,17 @@
 - Removed Tauri `beforeBuildCommand`/`beforeDevCommand` hooks and moved UI production build into `build.rs` for release builds (opt-out via `TAURI_SKIP_UI_BUILD=1`).
   - Implemented account funds display in app header with configurable periodic refresh (minimum 15 seconds, default 30 seconds).
   - Uses generic `betfair_rpc` command for account API calls (consistent with existing betting API pattern).
-  - `getAccountFunds` implemented in TypeScript calling `betfair_rpc` with service='account', method='getAccountFunds'.
+  - Fetches account details (including currencyCode) alongside funds on authentication.
+  - Currency symbol dynamically displayed based on account currency (GBP→£, EUR→€, USD→$, etc.) with fallback to currency code.
   - Created `useFunds` hook with periodic refresh based on user-configurable interval in settings.
-  - Funds available to bet displayed as a Chip in the AppBar (£ formatted with 2 decimal places).
+  - Added `getCurrencySymbol` helper in format.ts with support for 11 common currencies.
   - Settings panel includes TextField for configuring funds refresh interval with minimum 15 seconds validation.
+  - Created proper modular TypeScript architecture for Betfair API client:
+    - `ui/src/lib/betfair/types/{common,account,betting}.ts` - Domain-separated types
+    - `ui/src/lib/betfair/{account,betting}.ts` - Typed API method implementations
+    - `ui/src/lib/betfair/index.ts` - Re-exports all types and functions
+    - `ui/src/lib/betfair.ts` - Legacy wrapper (re-exports + auth functions for backwards compatibility)
+  - Updated all imports throughout codebase to use new modular structure.
   - Verified builds: `cargo build` and `npm --prefix ui run build` both succeed.
 
 - Now:

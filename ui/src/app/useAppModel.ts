@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import type { AccountFunds, MarketCatalogue } from '../types/betfair'
+import type { AccountFunds, MarketCatalogue } from '../lib/betfair'
 import { useAppSnackbar } from '../hooks/useAppSnackbar'
 import { useFunds } from '../hooks/useFunds'
 import { useMarkets } from '../hooks/useMarkets'
@@ -14,6 +14,7 @@ export type AppModel = {
 
   // Funds
   funds: AccountFunds | null
+  accountCurrency: string | null
   fundsLoading: boolean
   refreshFunds: () => Promise<void>
 
@@ -86,6 +87,7 @@ export function useAppModel(): AppModel {
     logout,
 
     funds: funds.funds,
+    accountCurrency: funds.accountDetails?.currencyCode ?? null,
     fundsLoading: funds.fundsLoading,
     refreshFunds: funds.refreshFunds,
 

@@ -12,8 +12,8 @@ import {
 } from '@mui/material'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { formatMoney } from '../lib/format'
-import type { AccountFunds } from '../types/betfair'
+import { formatMoney, getCurrencySymbol } from '../lib/format'
+import type { AccountFunds } from '../lib/betfair'
 import { LanguageSelect } from '../features/settings/LanguageSelect'
 import { ThemeModeToggle } from '../features/settings/ThemeModeToggle'
 
@@ -33,6 +33,7 @@ export function AppShell(props: {
   snackbar: SnackbarState
   onCloseSnackbar: () => void
   funds: AccountFunds | null
+  accountCurrency: string | null
   children: React.ReactNode
 }): React.ReactNode {
   const { t } = useTranslation(['common', 'auth', 'settings'])
@@ -60,7 +61,7 @@ export function AppShell(props: {
           <Stack direction="row" spacing={1} alignItems="center">
             {props.isAuthed && props.funds?.availableToBetBalance != null ? (
               <Chip
-                label={`£${formatMoney(props.funds.availableToBetBalance, '0.00')}`}
+                label={`${getCurrencySymbol(props.accountCurrency)}${formatMoney(props.funds.availableToBetBalance, '0.00')}`}
                 size="small"
                 color="primary"
                 variant="outlined"

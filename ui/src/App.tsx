@@ -27,6 +27,7 @@ function App() {
       snackbar={model.snackbar}
       onCloseSnackbar={model.clearSnackbar}
       funds={model.funds}
+      accountCurrency={model.accountCurrency}
     >
       <Container
         maxWidth={false}
@@ -63,6 +64,7 @@ function App() {
                   bestBackLayBySelectionId={model.bestBackLayBySelectionId}
                   snapshotConnected={model.snapshotConnected}
                   marketTradedVolume={model.marketTradedVolume}
+                  accountCurrency={model.accountCurrency}
                 />
               }
             />
