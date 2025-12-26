@@ -79,7 +79,8 @@
 - Confirmed Betfair RPC `ANGX-0007` root cause was a stale/dummy AppKey in the environment; runtime `.env` loading and precedence are now robust (crate-root `.env`, `.env` overrides sticky exported values).
 - Removed Tauri `beforeBuildCommand`/`beforeDevCommand` hooks and moved UI production build into `build.rs` for release builds (opt-out via `TAURI_SKIP_UI_BUILD=1`).
   - Implemented account funds display in app header with configurable periodic refresh (minimum 15 seconds, default 30 seconds).
-  - Added `get_account_funds` Tauri command (calls `AccountAPING/v1.0/getAccountFunds`).
+  - Uses generic `betfair_rpc` command for account API calls (consistent with existing betting API pattern).
+  - `getAccountFunds` implemented in TypeScript calling `betfair_rpc` with service='account', method='getAccountFunds'.
   - Created `useFunds` hook with periodic refresh based on user-configurable interval in settings.
   - Funds available to bet displayed as a Chip in the AppBar (£ formatted with 2 decimal places).
   - Settings panel includes TextField for configuring funds refresh interval with minimum 15 seconds validation.

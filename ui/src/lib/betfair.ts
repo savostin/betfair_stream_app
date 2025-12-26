@@ -102,7 +102,13 @@ export async function listNextHorseWinMarkets(): Promise<ListMarketCatalogueResp
 
 export async function getAccountFunds(): Promise<AccountFunds> {
   try {
-    return await tauriInvoke<AccountFunds>('get_account_funds')
+    return await tauriInvoke<AccountFunds>('betfair_rpc', {
+      args: { 
+        service: 'account', 
+        method: 'getAccountFunds', 
+        params: { wallet: 'UK' } 
+      },
+    })
   } catch (e) {
     const extracted = extractInvokeUiError(e)
     if (extracted) throw new UiError(extracted)

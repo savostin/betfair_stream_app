@@ -31,8 +31,30 @@ Implementation details:
   - `X-Authentication: <session token from Rust state>`
 
 This gives immediate support for:
-- `listMarketCatalogue`, `listMarketBook`, `placeOrders`, `cancelOrders`, etc.
+- **Betting**: `listMarketCatalogue`, `listMarketBook`, `placeOrders`, `cancelOrders`, etc.
+- **Account**: `getAccountFunds`, `getAccountDetails`, `getDeveloperAppKeys`, etc.
+- **Heartbeat**: `keepAlive`
 - Any filter shapes Betfair supports, because params are not constrained.
+
+**IMPORTANT - Do not create specific handler commands:**
+- ❌ **BAD**: Creating `get_account_funds`, `list_markets`, `place_order` Tauri commands
+- ✅ **GOOD**: All API calls use `betfair_rpc` from TypeScript
+- Keep Rust side lean and generic; implement logic in TypeScript
+- Only create specific handlers for complex business logic that combines multiple API calls or requires server-side state management
+
+**TypeScript pattern:**
+```typescript
+// src/lib/betfair.ts
+export async function getAccountFunds(): Promise<AccountFunds> {
+  return await tauriInvoke<AccountFunds>('betfair_rpc', {
+    args: { 
+      service: 'account', 
+      method: 'getAccountFunds', 
+      params: { wallet: 'UK' } 
+    },
+  })
+}
+```
 
 ## Allowlist Strategy
 - Maintain a single source of truth for allowed methods per service.
