@@ -1,15 +1,12 @@
 import { Box, Button, Divider, Paper, Stack, Typography } from '@mui/material'
-import type { MarketCatalogue } from '@betfair'
 import { useTranslation } from 'react-i18next'
+import { useMarketsContext } from '@hooks/marketsContext'
+import { useSelectedMarketContext } from '@hooks/selectedMarketContext'
 
-export function MarketList(props: {
-  markets: MarketCatalogue[]
-  selectedMarketId: string
-  marketsLoading: boolean
-  onRefresh: () => void
-  onSelectMarket: (marketId: string) => void
-}): React.ReactNode {
+export function MarketList(): React.ReactNode {
   const { t } = useTranslation(['markets', 'common'])
+  const { markets, isLoading, refresh } = useMarketsContext()
+  const { selectedMarketId, setSelectedMarketId } = useSelectedMarketContext()
 
   return (
     <Paper
@@ -27,13 +24,13 @@ export function MarketList(props: {
         <Typography variant="subtitle1" sx={{ fontWeight: 700, fontSize: 14 }}>
           {t('markets:panel.title')}
         </Typography>
-        <Button variant="outlined" onClick={props.onRefresh} disabled={props.marketsLoading}>
-          {props.marketsLoading ? t('common:actions.loading') : t('common:actions.refresh')}
+        <Button variant="outlined" onClick={refresh} disabled={isLoading}>
+          {isLoading ? t('common:actions.loading') : t('common:actions.refresh')}
         </Button>
       </Stack>
       <Divider />
       <Box sx={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
-        {props.markets.length === 0 ? (
+        {markets.length === 0 ? (
           <Box sx={{ p: 1.25 }}>
             <Typography variant="body2" color="text.secondary">
               {t('markets:empty.noMarkets')}
@@ -41,12 +38,12 @@ export function MarketList(props: {
           </Box>
         ) : null}
 
-        {props.markets.map((m) => (
+        {markets.map((m) => (
           <Box key={m.marketId}>
             <Button
-              onClick={() => props.onSelectMarket(m.marketId)}
-              variant={m.marketId === props.selectedMarketId ? 'contained' : 'text'}
-              color={m.marketId === props.selectedMarketId ? 'primary' : 'inherit'}
+              onClick={() => setSelectedMarketId(m.marketId)}
+              variant={m.marketId === selectedMarketId ? 'contained' : 'text'}
+              color={m.marketId === selectedMarketId ? 'primary' : 'inherit'}
               sx={{
                 width: '100%',
                 justifyContent: 'flex-start',

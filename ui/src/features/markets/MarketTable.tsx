@@ -12,34 +12,23 @@ import {
   Typography,
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
-import type { MarketCatalogue } from '@betfair'
+import { useAccountContext } from '@hooks/accountContext'
+import { useSelectedMarketContext } from '@hooks/selectedMarketContext'
 import { formatMoney } from '@lib/format'
 import { LtpCell } from './cells/LtpCell'
 import { PriceAmountCell } from './cells/PriceAmountCell'
 import { BACK_COLOR, LAY_COLOR } from '@theme/colors'
 
-export function MarketTable(props: {
-  selectedMarket: MarketCatalogue | null
-  bestBackLayBySelectionId: Map<
-    number,
-    {
-      back: Array<{ price: number; size: number }>
-      lay: Array<{ price: number; size: number }>
-      ltp?: number
-      tv?: number
-    }
-  >
-  snapshotConnected: boolean
-  marketTradedVolume: number | null
-  accountCurrency: string | null
-}): React.ReactNode {
+export function MarketTable(): React.ReactNode {
   const theme = useTheme()
   const { t } = useTranslation(['markets', 'common'])
+  const { accountCurrency } = useAccountContext()
+  const { selectedMarket, bestBackLayBySelectionId, marketTradedVolume } = useSelectedMarketContext()
 
   const dash = t('common:placeholder.dash')
-  const formatAmount = (n: number) => formatMoney(n, dash, props.accountCurrency ?? undefined)
+  const formatAmount = (n: number) => formatMoney(n, dash, accountCurrency ?? undefined)
 
-  if (!props.selectedMarket) {
+  if (!selectedMarket) {
     return (
       <Box sx={{ p: 1 }}>
         <Typography variant="h6" sx={{ fontSize: 16, mb: 0.5 }}>
@@ -52,8 +41,7 @@ export function MarketTable(props: {
     )
   }
 
-  const selectedMarket = props.selectedMarket
-  const matchedVolume = props.marketTradedVolume ?? selectedMarket.totalMatched
+  const matchedVolume = marketTradedVolume ?? selectedMarket.totalMatched
 
   // Use lighter/darker variants for sticky header to avoid transparency issues
   const backHeaderBg = alpha(theme.palette.mode === 'dark' ? darken(BACK_COLOR, 0.6) : darken(BACK_COLOR, 0.2), 0.8)
@@ -86,7 +74,7 @@ export function MarketTable(props: {
 
         <Box sx={{ textAlign: { xs: 'left', sm: 'right' } }}>
           <Typography variant="caption" color="text.secondary" display="block">
-            {t('markets:meta.matched', { amount: formatMoney(matchedVolume, dash, props.accountCurrency ?? undefined) })}
+            {t('markets:meta.matched', { amount: formatMoney(matchedVolume, dash, accountCurrency ?? undefined) })}
           </Typography>
         </Box>
       </Stack>
@@ -120,7 +108,7 @@ export function MarketTable(props: {
               .slice()
               .sort((a, b) => (a.sortPriority ?? 0) - (b.sortPriority ?? 0))
               .map((r) => {
-                const best = props.bestBackLayBySelectionId.get(r.selectionId)
+                const best = bestBackLayBySelectionId.get(r.selectionId)
                 const b1 = best?.back[0]
                 const b2 = best?.back[1]
                 const b3 = best?.back[2]

@@ -1,77 +1,41 @@
 import { Box, Container } from '@mui/material'
-import { useState } from 'react'
-
 import { AppShell } from '@app/AppShell'
-import { AuthGate } from '@app/AuthGate'
-import { useAppModel } from '@app/useAppModel'
 import { LoginController } from '@features/auth/LoginController'
-import { MarketsView } from '@features/markets/MarketsView'
-import { SettingsPage } from '@pages/SettingsPage'
+import { useNavigation } from '@hooks/navigationContext'
+import { useSessionContext } from '@hooks/sessionContext'
+import { routes } from '@pages/Router'
 
 function App() {
-  const model = useAppModel()
-  const [page, setPage] = useState<'main' | 'settings'>('main')
+  const session = useSessionContext()
+  const { currentPage } = useNavigation()
 
-  function onLogout(): void {
-    setPage('main')
-    model.logout()
-  }
+  const PageComponent = routes[currentPage]
 
   return (
-    <AppShell
-      isAuthed={model.isAuthed}
-      onLogout={model.isAuthed ? onLogout : undefined}
-      isSettingsPage={page === 'settings'}
-      onOpenSettings={page !== 'settings' ? () => setPage('settings') : undefined}
-      onCloseSettings={page === 'settings' ? () => setPage('main') : undefined}
-      snackbar={model.snackbar}
-      onCloseSnackbar={model.clearSnackbar}
-      funds={model.funds}
-      accountCurrency={model.accountCurrency}
-      statusMessage={model.statusMessage}
-    >
-      <Container
-        maxWidth={false}
-        sx={{
-          pt: 2,
-          pb: 0,
-          px: { xs: 1, sm: 2 },
-          flex: 1,
-          minHeight: 0,
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden',
-        }}
-      >
-        <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
-          {page === 'settings' ? (
-            <SettingsPage />
-          ) : (
-            <AuthGate
-              isAuthed={model.isAuthed}
-              unauthenticated={
-                <LoginController
-                  login={model.login}
-                />
-              }
-              authenticated={
-                <MarketsView
-                  markets={model.markets}
-                  marketsLoading={model.marketsLoading}
-                  selectedMarketId={model.selectedMarketId}
-                  selectedMarket={model.selectedMarket}
-                  onRefreshMarkets={model.refreshMarkets}
-                  onSelectMarket={model.setSelectedMarketId}
-                  bestBackLayBySelectionId={model.bestBackLayBySelectionId}
-                  snapshotConnected={model.snapshotConnected}
-                  marketTradedVolume={model.marketTradedVolume}
-                  accountCurrency={model.accountCurrency}
-                />
-              }
-            />
-          )}
-        </Box>
-      </Container>
+    <AppShell>
+      {!session.isAuthed ? (
+        <Container maxWidth="sm" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
+          <LoginController login={session.login} />
+        </Container>
+      ) : (
+        <Container
+          maxWidth={false}
+          sx={{
+            pt: 2,
+            pb: 0,
+            px: { xs: 1, sm: 2 },
+            flex: 1,
+            minHeight: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+          }}
+        >
+          <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+            <PageComponent />
+          </Box>
+        </Container>
+      )}
     </AppShell>
   )
 }

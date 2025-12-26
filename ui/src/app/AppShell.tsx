@@ -9,36 +9,25 @@ import {
   Stack,
   Toolbar,
   Typography,
-  type AlertColor,
 } from '@mui/material'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { formatMoney, getCurrencySymbol } from '@lib/format'
-import type { AccountFunds } from '@betfair'
 import { LanguageSelect } from '@features/settings/LanguageSelect'
 import { ThemeModeToggle } from '@features/settings/ThemeModeToggle'
-
-export type SnackbarState =
-  | null
-  | {
-      severity: AlertColor
-      message: string
-    }
+import { useAccountContext } from '@hooks/accountContext'
+import { useNavigation } from '@hooks/navigationContext'
+import { useNotifications } from '@hooks/notificationsContext'
+import { useSessionContext } from '@hooks/sessionContext'
+import { formatMoney, getCurrencySymbol } from '@lib/format'
 
 export function AppShell(props: {
-  isAuthed: boolean
-  onLogout?: () => void
-  isSettingsPage?: boolean
-  onOpenSettings?: () => void
-  onCloseSettings?: () => void
-  snackbar: SnackbarState
-  onCloseSnackbar: () => void
-  funds: AccountFunds | null
-  accountCurrency: string | null
-  statusMessage: string
   children: React.ReactNode
 }): React.ReactNode {
   const { t } = useTranslation(['common', 'auth', 'settings'])
+  const session = useSessionContext()
+  const account = useAccountContext()
+  const notifications = useNotifications()
+  const navigation = useNavigation()
 
   useEffect(() => {
     document.title = t('common:app.title')
@@ -61,31 +50,31 @@ export function AppShell(props: {
           </Typography>
 
           <Stack direction="row" spacing={1} alignItems="center">
-            {props.isAuthed && props.funds?.availableToBetBalance != null ? (
+            {session.isAuthed && account.funds?.availableToBetBalance != null ? (
               <Chip
-                label={`${getCurrencySymbol(props.accountCurrency)}${formatMoney(props.funds.availableToBetBalance, '0.00')}`}
+                label={`${getCurrencySymbol(account.accountCurrency)}${formatMoney(account.funds.availableToBetBalance, '0.00')}`}
                 size="small"
                 color="primary"
                 variant="outlined"
               />
             ) : null}
 
-            {props.isSettingsPage && props.onCloseSettings ? (
-              <Button color="inherit" onClick={props.onCloseSettings}>
+            {navigation.currentPage === 'settings' ? (
+              <Button color="inherit" onClick={() => navigation.navigate('main')}>
                 {t('common:actions.back')}
               </Button>
-            ) : !props.isSettingsPage && props.onOpenSettings ? (
-              <Button color="inherit" onClick={props.onOpenSettings}>
+            ) : (
+              <Button color="inherit" onClick={() => navigation.navigate('settings')}>
                 {t('settings:panel.title')}
               </Button>
-            ) : null}
+            )}
 
             <Box sx={{ minWidth: 150 }}>
               <LanguageSelect />
             </Box>
             <ThemeModeToggle />
-            {props.isAuthed && props.onLogout ? (
-              <Button color="inherit" onClick={props.onLogout}>
+            {session.isAuthed ? (
+              <Button color="inherit" onClick={session.logout}>
                 {t('auth:logout')}
               </Button>
             ) : null}
@@ -97,27 +86,27 @@ export function AppShell(props: {
 
       <Paper elevation={1} sx={{ bgcolor: 'background.paper', px: 2, py: 1, borderTop: 1, borderTopColor: 'divider' }}>
         <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-          {props.statusMessage}
+          {notifications._statusMessage}
         </Typography>
       </Paper>
 
       <Snackbar
-        open={Boolean(props.snackbar)}
+        open={Boolean(notifications._snackbar)}
         onClose={(_, reason) => {
           if (reason === 'clickaway') return
-          props.onCloseSnackbar()
+          notifications._clearSnackbar()
         }}
-        autoHideDuration={props.snackbar?.severity === 'info' ? 2500 : 6000}
+        autoHideDuration={notifications._snackbar?.severity === 'info' ? 2500 : 6000}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         sx={{ top: { xs: 64, sm: 72 } }}
       >
         <Alert
-          severity={props.snackbar?.severity ?? 'info'}
+          severity={notifications._snackbar?.severity ?? 'info'}
           variant="filled"
-          onClose={props.onCloseSnackbar}
+          onClose={notifications._clearSnackbar}
           sx={{ width: '100%' }}
         >
-          {props.snackbar?.message ?? ''}
+          {notifications._snackbar?.message ?? ''}
         </Alert>
       </Snackbar>
     </Box>

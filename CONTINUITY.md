@@ -111,18 +111,27 @@
     - ✅ Currency symbols threaded to matched volume and amounts in markets table.
 
 - Now:
-  - Implemented additional core Betfair types in `ui/src/lib/betfair/types/{common,betting}.ts` to support browse, market book, and orders APIs.
-  - Implemented `listMarketCatalogue` and all remaining betting general wrappers using `betfairInvokeSafe` (`listEventTypes`, `listCompetitions`, `listTimeRanges`, `listEvents`, `listMarketTypes`, `listCountries`, `listVenues`, `listMarketBook`, `listRunnerBook`, `listCurrentOrders`, `listClearedOrders`, `placeOrders`, `cancelOrders`, `replaceOrders`, `updateOrders`).
-  - Added typed models for cleared orders and updated `listClearedOrders` to return `ClearedOrderSummaryReport`.
-  - Re-exported new methods from `ui/src/lib/betfair/index.ts`.
-  - UI build succeeded (`npm --prefix ui run build`).
-  - Commit the CI/release workflow adjustments (if uncommitted), then tag and publish a release.
-
-## Open questions (UNCONFIRMED if needed):
-- UNCONFIRMED: If login still fails, what exact response body/content-type does Betfair Identity return in your locale/account?
-
-## Working set (files/ids/commands):
-- .github/workflows/release.yml
+  - **TanStack Query Migration (Complete)**
+    - ✅ Installed @tanstack/react-query v5
+    - ✅ Created `ui/src/lib/queries.ts` with 6 query hooks (useAccountFunds, useAccountDetails, useNextHorseWinMarkets, useCurrentOrders, useAccountStatement) + 2 mutation hooks + utility function
+    - ✅ Updated `ui/src/app/AppProviders.tsx` with QueryClientProvider setup (staleTime: 30s, gcTime: 5min, retry: 1)
+    - ✅ Rewrote `ui/src/app/useAppModel.ts` to use TanStack Query hooks instead of custom hooks
+    - ✅ Removed legacy hooks `useFunds.ts` and `useMarkets.ts`
+    - ✅ MarketsView/App now consume the query-backed model directly (prop plumbing simplified)
+    - ✅ UI build succeeded (`npm --prefix ui run build` - passes TypeScript strict mode)
+  - **Domain context split**
+    - ✅ Added context-wrapped hooks for session, notifications (snackbar+status), account (funds/details), markets list, selected market (stream + selection), and orders under `ui/src/hooks/*Context.tsx`
+    - ✅ AppProviders now composes these providers
+    - ✅ App/Markets components consume contexts directly; removed `useAppModel`
+    - ✅ AppShell consumes contexts directly (no prop drilling for auth/funds/status/snackbar)
+    - ✅ UI build succeeds after refactor
+   - **Navigation context for Tauri SPA routing**
+     - ✅ Added NavigationProvider with page enum (main, settings, accountStatement, orders)
+     - ✅ App uses currentPage from navigation context and renders appropriate component
+     - ✅ Auth gating: unauthenticated users see only LoginController; authenticated users see pages
+     - ✅ SessionContext.logout resets navigation to 'main'
+     - ✅ Removed isSettingsPage props from AppShell; uses navigation hooks for nav buttons
+     - ✅ UI build succeeds
 - .github/workflows/ci.yml
 - scripts/release.sh
 - scripts/app-config.sh
