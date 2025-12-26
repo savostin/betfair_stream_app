@@ -39,6 +39,9 @@ export type AppModel = {
   snapshotConnected: boolean
   marketTradedVolume: number | null
 
+  // Status
+  statusMessage: string
+
   // Notifications
   snackbar: ReturnType<typeof useAppSnackbar>['snackbar']
   clearSnackbar: () => void
@@ -68,6 +71,13 @@ export function useAppModel(): AppModel {
   const selectedMarket = useMemo(() => {
     return markets.markets.find((m) => m.marketId === stream.selectedMarketId) ?? null
   }, [markets.markets, stream.selectedMarketId])
+
+  const statusMessage = useMemo(() => {
+    if (markets.marketsLoading) return '↻ Loading markets...'
+    if (markets.markets.length === 0) return '◇ No markets loaded'
+    if (!stream.snapshotConnected) return `◇ ${markets.markets.length} markets • ↻ Connecting to stream...`
+    return `✓ ${markets.markets.length} markets • ✓ Stream connected`
+  }, [markets.marketsLoading, markets.markets.length, stream.snapshotConnected])
 
   async function login(args: { username: string; password: string }): Promise<void> {
     try {
@@ -105,6 +115,8 @@ export function useAppModel(): AppModel {
     bestBackLayBySelectionId: stream.bestBackLayBySelectionId,
     snapshotConnected: stream.snapshotConnected,
     marketTradedVolume: stream.marketTradedVolume,
+
+    statusMessage,
 
     snackbar: snackbar.snackbar,
     clearSnackbar: snackbar.clearSnackbar,

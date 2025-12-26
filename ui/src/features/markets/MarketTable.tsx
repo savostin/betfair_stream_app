@@ -170,12 +170,6 @@ export function MarketTable(props: {
           </TableBody>
         </Table>
       </TableContainer>
-
-      {!props.snapshotConnected ? (
-        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
-          {t('markets:status.connecting')}
-        </Typography>
-      ) : null}
     </>
   )
 }

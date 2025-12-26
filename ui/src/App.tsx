@@ -28,6 +28,7 @@ function App() {
       onCloseSnackbar={model.clearSnackbar}
       funds={model.funds}
       accountCurrency={model.accountCurrency}
+      statusMessage={model.statusMessage}
     >
       <Container
         maxWidth={false}

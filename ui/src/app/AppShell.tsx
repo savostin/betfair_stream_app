@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   Chip,
+  Paper,
   Snackbar,
   Stack,
   Toolbar,
@@ -34,6 +35,7 @@ export function AppShell(props: {
   onCloseSnackbar: () => void
   funds: AccountFunds | null
   accountCurrency: string | null
+  statusMessage: string
   children: React.ReactNode
 }): React.ReactNode {
   const { t } = useTranslation(['common', 'auth', 'settings'])
@@ -92,6 +94,12 @@ export function AppShell(props: {
       </AppBar>
 
       <Box sx={{ flex: 1, minHeight: 0, display: 'flex' }}>{props.children}</Box>
+
+      <Paper elevation={1} sx={{ bgcolor: 'background.paper', px: 2, py: 1, borderTop: 1, borderTopColor: 'divider' }}>
+        <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+          {props.statusMessage}
+        </Typography>
+      </Paper>
 
       <Snackbar
         open={Boolean(props.snackbar)}

@@ -130,7 +130,6 @@ export class TauriStreamClient {
       if (msg.statusCode === 'SUCCESS') {
         this.authenticated = true
         this.pendingAuth = false
-        this.opts.onInfo?.({ key: 'errors:stream.authenticated' })
 
         if (this.currentMarketId) {
           this.sendMarketSubscription(this.currentMarketId)
