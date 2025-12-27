@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, type PropsWithChildren } from 'react'
 import type { MarketCatalogue } from '@betfair'
+import type { MarketSnapshot } from '@betfair/types/stream'
 import { useMarketStream } from './useMarketStream'
 import { useSessionContext } from './sessionContext'
 import { useMarketsContext } from './marketsContext'
@@ -9,6 +10,7 @@ export type SelectedMarketValue = {
   selectedMarketId: string
   setSelectedMarketId: (marketId: string) => void
   selectedMarket: MarketCatalogue | null
+  snapshot: MarketSnapshot | null
   snapshotConnected: boolean
   marketTradedVolume: number | null
   bestBackLayBySelectionId: ReturnType<typeof useMarketStream>['bestBackLayBySelectionId']
@@ -59,11 +61,12 @@ export function SelectedMarketProvider({ children }: PropsWithChildren): React.R
       selectedMarketId: stream.selectedMarketId,
       setSelectedMarketId: stream.setSelectedMarketId,
       selectedMarket,
+      snapshot: stream.snapshot,
       snapshotConnected: stream.snapshotConnected,
       marketTradedVolume: stream.marketTradedVolume,
       bestBackLayBySelectionId: stream.bestBackLayBySelectionId,
     }),
-    [selectedMarket, stream.bestBackLayBySelectionId, stream.marketTradedVolume, stream.selectedMarketId, stream.setSelectedMarketId, stream.snapshotConnected],
+    [selectedMarket, stream.bestBackLayBySelectionId, stream.marketTradedVolume, stream.selectedMarketId, stream.setSelectedMarketId, stream.snapshotConnected, stream.snapshot],
   )
 
   return <SelectedMarketContext.Provider value={value}>{children}</SelectedMarketContext.Provider>

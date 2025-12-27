@@ -73,47 +73,61 @@ export function roundPrice(price: number): number {
 
 /**
  * Increment a price to the next valid price on the ladder.
+ * @param price - The starting price
+ * @param ticks - Number of ticks to increment (default: 1)
  */
-export function incrementPrice(price: number): number {
-  const rounded = roundPrice(price)
-  const increment = getPriceIncrement(rounded)
-  let next = rounded + increment
+export function incrementPrice(price: number, ticks: number = 1): number {
+  let current = roundPrice(price)
+  
+  for (let i = 0; i < ticks; i++) {
+    const increment = getPriceIncrement(current)
+    let next = current + increment
 
-  // Handle range transitions
-  if (next >= 1000) return 1000
-  
-  // Check if we've crossed into a new range
-  const currentRange = PRICE_RANGES.find((r) => rounded >= r.min && rounded < r.max)
-  const nextRange = PRICE_RANGES.find((r) => next >= r.min && next < r.max)
-  
-  if (currentRange !== nextRange && nextRange) {
-    // Snap to the start of the next range
-    next = nextRange.min
+    // Handle range transitions
+    if (next >= 1000) return 1000
+    
+    // Check if we've crossed into a new range
+    const currentRange = PRICE_RANGES.find((r) => current >= r.min && current < r.max)
+    const nextRange = PRICE_RANGES.find((r) => next >= r.min && next < r.max)
+    
+    if (currentRange !== nextRange && nextRange) {
+      // Snap to the start of the next range
+      next = nextRange.min
+    }
+
+    current = roundPrice(next)
   }
 
-  return roundPrice(next)
+  return current
 }
 
 /**
  * Decrement a price to the previous valid price on the ladder.
+ * @param price - The starting price
+ * @param ticks - Number of ticks to decrement (default: 1)
  */
-export function decrementPrice(price: number): number {
-  const rounded = roundPrice(price)
-  const increment = getPriceIncrement(rounded)
-  let prev = rounded - increment
-
-  if (prev < 1.01) return 1.01
-
-  // Check if we've crossed into a new range
-  const currentRange = PRICE_RANGES.find((r) => rounded >= r.min && rounded < r.max)
-  const prevRange = PRICE_RANGES.find((r) => prev >= r.min && prev < r.max)
+export function decrementPrice(price: number, ticks: number = 1): number {
+  let current = roundPrice(price)
   
-  if (currentRange !== prevRange && prevRange) {
-    // Snap to the end of the previous range (just below the current range start)
-    prev = rounded - (currentRange?.increment ?? 0.01)
+  for (let i = 0; i < ticks; i++) {
+    const increment = getPriceIncrement(current)
+    let prev = current - increment
+
+    if (prev < 1.01) return 1.01
+
+    // Check if we've crossed into a new range
+    const currentRange = PRICE_RANGES.find((r) => current >= r.min && current < r.max)
+    const prevRange = PRICE_RANGES.find((r) => prev >= r.min && prev < r.max)
+    
+    if (currentRange !== prevRange && prevRange) {
+      // Snap to the end of the previous range (just below the current range start)
+      prev = current - (currentRange?.increment ?? 0.01)
+    }
+
+    current = roundPrice(prev)
   }
 
-  return roundPrice(prev)
+  return current
 }
 
 /**

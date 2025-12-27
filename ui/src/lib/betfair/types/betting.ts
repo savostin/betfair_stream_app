@@ -275,3 +275,21 @@ export interface ClearedOrderSummaryReport {
   clearedOrders: ClearedOrderSummary[]
   moreAvailable?: boolean
 }
+
+// Market profit and loss
+export interface RunnerProfitAndLoss {
+  selectionId?: number
+  ifWin?: number
+  ifLose?: number
+  ifPlace?: number
+}
+
+export interface MarketProfitAndLoss {
+  marketId?: string
+  commissionApplied?: number
+  profitAndLosses?: RunnerProfitAndLoss[]
+}
+
+export interface ListMarketProfitAndLossResponse {
+  result?: MarketProfitAndLoss[]
+}

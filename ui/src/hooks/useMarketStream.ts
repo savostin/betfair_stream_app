@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import type { MarketSnapshot } from '@lib/streamState'
+import type { MarketSnapshot } from '@betfair/types/stream'
 import { TauriStreamClient, type UiMessage } from '@lib/stream'
 
 export type MarketStreamState = {

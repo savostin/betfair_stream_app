@@ -60,6 +60,7 @@ fn build_allowlist_betting() -> HashSet<String> {
         "listRunnerBook",
         "listCurrentOrders",
         "listClearedOrders",
+        "listMarketProfitAndLoss",
         "placeOrders",
         "cancelOrders",
         "replaceOrders",

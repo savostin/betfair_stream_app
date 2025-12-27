@@ -1,7 +1,9 @@
 export function formatMoney(n: number | undefined, placeholder: string, currency?: string): string {
   if (n === undefined || Number.isNaN(n)) return placeholder
-  const formatted = n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-  return currency ? `${getCurrencySymbol(currency)}${formatted}` : formatted
+  const sign = n < 0 ? '-' : ''
+  const abs = Math.abs(n)
+  const formatted = abs.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  return currency ? `${sign}${getCurrencySymbol(currency)}${formatted}` : `${sign}${formatted}`
 }
 
 const CURRENCY_SYMBOLS: Record<string, string> = {

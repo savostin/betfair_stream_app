@@ -1,65 +1,30 @@
-export type SegmentType = 'SEG_START' | 'SEG' | 'SEG_END'
-export type ChangeType = 'SUB_IMAGE' | 'RESUB_DELTA' | 'HEARTBEAT'
+import type {
+  SegmentType,
+  ChangeType,
+  MarketDefinition,
+  StreamMcmMessage,
+  MarketChange,
+  RunnerChange,
+  LadderLevel,
+  RunnerState,
+  MarketState,
+  MarketSnapshot,
+  ApplyMcmOptions,
+} from '@betfair/types/stream'
 
-export type StreamMcmMessage = {
-  op?: 'mcm'
-  id?: number
-  ct?: ChangeType
-  segmentType?: SegmentType
-  pt?: number
-  clk?: string
-  initialClk?: string
-  mc?: MarketChange[]
-}
-
-export type MarketChange = {
-  id?: string
-  img?: boolean
-  tv?: number
-  marketDefinition?: unknown
-  rc?: RunnerChange[]
-}
-
-export type RunnerChange = {
-  id?: number
-  ltp?: number
-  tv?: number
-  batb?: Array<[number, number, number]>
-  batl?: Array<[number, number, number]>
-}
-
-export type LadderLevel = { level: number; price: number; size: number }
-
-export type RunnerState = {
-  selectionId: number
-  ltp?: number
-  tv?: number
-  batb: Map<number, LadderLevel>
-  batl: Map<number, LadderLevel>
-}
-
-export type MarketState = {
-  marketId: string
-  publishTime?: number
-  clk?: string
-  tradedVolume?: number
-  marketDefinition?: unknown
-  runners: Map<number, RunnerState>
-}
-
-export type MarketSnapshot = {
-  marketId: string
-  publishTime?: number
-  clk?: string
-  tradedVolume?: number
-  marketDefinition?: unknown
-  runners: Array<{
-    selectionId: number
-    ltp?: number
-    tv?: number
-    batb: LadderLevel[]
-    batl: LadderLevel[]
-  }>
+// Re-export types for convenience
+export type {
+  SegmentType,
+  ChangeType,
+  MarketDefinition,
+  StreamMcmMessage,
+  MarketChange,
+  RunnerChange,
+  LadderLevel,
+  RunnerState,
+  MarketState,
+  MarketSnapshot,
+  ApplyMcmOptions,
 }
 
 function upsertLadderLevels(
@@ -85,11 +50,6 @@ export function emptyMarketState(marketId: string): MarketState {
     marketId,
     runners: new Map(),
   }
-}
-
-export type ApplyMcmOptions = {
-  currentSubscriptionId: number
-  selectedMarketId: string
 }
 
 export function applyMcm(

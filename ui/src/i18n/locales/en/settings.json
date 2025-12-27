@@ -2,7 +2,15 @@
   "panel": {
     "title": "Settings",
     "fundsRefreshInterval": "Funds Refresh (seconds)",
-    "fundsRefreshIntervalHelp": "Minimum 15 seconds"
+    "fundsRefreshIntervalHelp": "Minimum 15 seconds",
+    "defaultBetSize": "Default Bet Size (£)",
+    "defaultBetSizeHelp": "Minimum £0.50",
+    "priceOffsetTicks": "Price Offset (ticks)",
+    "priceOffsetTicksHelp": "Adjust price by this many ticks (BACK decrements, LAY increments)",
+    "priceLadderDepth": "Price ladder depth",
+    "priceLadderDepthHelp": "Choose how many prices to display on each side",
+    "priceLadderDepthBest": "Best only",
+    "priceLadderDepthThree": "Best 3 prices"
   },
   "theme": {
     "label": "Theme",

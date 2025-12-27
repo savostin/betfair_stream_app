@@ -11,7 +11,13 @@
     "loadedMarkets": "Se cargaron {{count}} mercados"
   },
   "status": {
-    "connecting": "Conectando/suscribiendo…"
+    "connecting": "Conectando…",
+    "betfair": {
+      "IN-PLAY": "IN-PLAY",
+      "SUSPENDED": "SUSPENDIDO",
+      "CLOSED": "CERRADO",
+      "OPEN": "ABIERTO"
+    }
   },
   "meta": {
     "marketId": "marketId: {{id}}",
@@ -22,5 +28,17 @@
     "back": "Back",
     "ltp": "LTP",
     "lay": "Lay"
+  },
+  "bet": {
+    "placed": "Apuesta {{side}} colocada en {{runner}}",
+    "error": {
+      "unknown": "Fallo al colocar apuesta",
+      "INSUFFICIENT_FUNDS": "Fondos insuficientes",
+      "INVALID_ODDS": "Cuotas inválidas",
+      "INVALID_PRICE": "Precio inválido",
+      "INVALID_MARKET_ID": "Mercado inválido",
+      "MARKET_SUSPENDED": "Mercado suspendido",
+      "BET_TAKEN_OR_LAPSED": "Apuesta tomada o caducada"
+    }
   }
 }

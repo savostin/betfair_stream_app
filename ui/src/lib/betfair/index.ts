@@ -27,6 +27,8 @@ export type {
   ItemDescription,
   ClearedOrderSummary,
   ClearedOrderSummaryReport,
+  RunnerProfitAndLoss,
+  MarketProfitAndLoss,
 } from './types/betting'
 
 // Account API (general)
@@ -50,7 +52,8 @@ export {
   cancelOrders,
   replaceOrders,
   updateOrders,
+  listMarketProfitAndLoss,
 } from './api/betting'
-export { listNextHorseWinMarkets } from './betting'
+export { listNextHorseWinMarkets, quickPlaceBet } from './betting'
 // Auth
 export { betfairLogin } from '@lib/betfair'

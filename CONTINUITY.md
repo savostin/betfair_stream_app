@@ -32,7 +32,7 @@
 
 ## State:
 - Now:
-  - Completed comprehensive alias cleanup across the codebase using @lib, @errors, @betfair, @hooks, @features, @theme, @pages, @app.
+  - Runner status filtering & display complete. HIDDEN runners hidden completely. REMOVED runners: all price cells (back depth 3, b1, LTP, lay depth 3) joined into single colspan cell showing adjustment factor (×0.5) and removal date/time centered on light error background. ACTIVE/WINNER/LOSER rows show normally. Build succeeds.
 
 - Done:
   - DMG packaging script and workflow wiring.
@@ -92,11 +92,30 @@
     - `ui/src/lib/betfair.ts` - Legacy wrapper (re-exports + auth functions for backwards compatibility)
   - Updated all imports throughout codebase to use new modular structure.
   - Verified builds: `cargo build` and `npm --prefix ui run build` both succeed.
+  - Implemented one-click betting feature:
+    - Added bet size (default £10, min £0.50) and price offset (0-10 ticks) settings to SettingsPanel with localStorage persistence.
+    - Updated `incrementPrice` and `decrementPrice` in `price.ts` to accept `ticks` parameter for multi-tick price adjustments.
+    - Added `listMarketProfitAndLoss` API: types in `types/betting.ts`, implementation in `api/betting.ts`, exported from `index.ts`.
+    - Created `quickPlaceBet()` function in `betting.ts` that reads settings, applies tick offset (decrement for BACK, increment for LAY), places LIMIT order with LAPSE persistence.
+    - Wired quick-place to B1/L1 price cells in MarketTable - click to place bet instantly without confirmation.
+    - PriceAmountCell now accepts onClick/clickable props with hover effects (opacity + scale).
+    - Created `useMarketProfitAndLoss` hook with 5-second refresh interval polling `listMarketProfitAndLoss`.
+    - Display live P&L under runner names in MarketTable: green for profit, red for loss, shows `ifWin` or `ifLose` value.
+    - Added bet placement notifications with i18n (success info, error codes like INSUFFICIENT_FUNDS, INVALID_ODDS).
+    - Quick-place automatically refreshes orders and account funds queries on successful bet placement.
+    - Added `listMarketProfitAndLoss` to Rust betting allowlist in `src/state.rs`.
+    - Modified `listNextHorseWinMarkets` to include races from -10 minutes ago.
+    - Refined hover effects on B1/L1 cells: removed zoom/opacity, now uses header background color on entire TableCell.
+    - Refactored stream types: moved all type definitions from `streamState.ts` to `stream-types/stream-types.ts`, added `@stream-types/*` path alias in `tsconfig.app.json`, updated imports in `streamState.ts` (imports and re-exports) and `useMarketStream.ts`.
+    - Added market status display (IN-PLAY/status) from stream marketDefinition under market name.
+    - Added price ladder depth setting (best only vs best 3), stored in settings and applied to market table rendering.
+  - Verified builds: `cargo build` and `npm --prefix ui run build` both succeed.
 
   ## Key decisions (update):
   - Separated general Betfair API methods into `ui/src/lib/betfair/api/` (`account.ts`, `betting.ts`).
-  - Kept custom convenience wrappers in `ui/src/lib/betfair/` (e.g., `listNextHorseWinMarkets`).
+  - Kept custom convenience wrappers in `ui/src/lib/betfair/` (e.g., `listNextHorseWinMarkets`, `quickPlaceBet`).
   - Central re-exports in `ui/src/lib/betfair/index.ts` now export general methods from `api/` and custom wrappers from top-level.
+  - One-click betting: no confirmation dialog for speed; price offset applied automatically based on side (BACK decrements, LAY increments).
 
   ## State (delta):
   - Done:

@@ -29,6 +29,7 @@ import type {
   UpdateInstruction,
   UpdateExecutionReport,
   ClearedOrderSummaryReport,
+  MarketProfitAndLoss,
 } from '@betfair/types/betting'
 import type { TimeGranularity, ClearedOrderStatus } from '@betfair/types/common'
 
@@ -235,4 +236,21 @@ export async function updateOrders(
     ...(customerRef && { customerRef }),
   }
   return betfairInvokeSafe<UpdateExecutionReport>({ service: 'betting', method: 'updateOrders', params })
+}
+
+export async function listMarketProfitAndLoss(
+  marketIds: string[],
+  options?: {
+    includeSettledBets?: boolean
+    includeBspBets?: boolean
+    netOfCommission?: boolean
+  },
+): Promise<MarketProfitAndLoss[]> {
+  const params = {
+    marketIds,
+    ...(options?.includeSettledBets !== undefined && { includeSettledBets: options.includeSettledBets }),
+    ...(options?.includeBspBets !== undefined && { includeBspBets: options.includeBspBets }),
+    ...(options?.netOfCommission !== undefined && { netOfCommission: options.netOfCommission }),
+  }
+  return betfairInvokeSafe<MarketProfitAndLoss[]>({ service: 'betting', method: 'listMarketProfitAndLoss', params })
 }

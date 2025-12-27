@@ -2,7 +2,15 @@
   "panel": {
     "title": "Configuración",
     "fundsRefreshInterval": "Actualización de fondos (segundos)",
-    "fundsRefreshIntervalHelp": "Mínimo 15 segundos"
+    "fundsRefreshIntervalHelp": "Mínimo 15 segundos",
+    "defaultBetSize": "Tamaño de apuesta predeterminado (£)",
+    "defaultBetSizeHelp": "Mínimo £0.50",
+    "priceOffsetTicks": "Desplazamiento de precio (ticks)",
+    "priceOffsetTicksHelp": "0-10 ticks desde mejor precio",
+    "priceLadderDepth": "Profundidad de precios",
+    "priceLadderDepthHelp": "Elige cuántos precios mostrar en cada lado",
+    "priceLadderDepthBest": "Solo mejor",
+    "priceLadderDepthThree": "Mejores 3 precios"
   },
   "theme": {
     "label": "Tema",
