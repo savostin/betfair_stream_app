@@ -2,6 +2,7 @@ import { Box, Button, Divider, Paper, Stack, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { useMarketsContext } from '@hooks/marketsContext'
 import { useSelectedMarketContext } from '@hooks/selectedMarketContext'
+import { formatTime } from '@lib/format'
 
 export function MarketList(): React.ReactNode {
   const { t } = useTranslation(['markets', 'common'])
@@ -61,7 +62,7 @@ export function MarketList(): React.ReactNode {
                     {m.event?.name ?? ''}
                   </Typography>
                   <Typography variant="caption" color="text.secondary" noWrap>
-                    {m.marketStartTime ? new Date(m.marketStartTime).toLocaleTimeString() : ''}
+                    {formatTime(m.marketStartTime, '–', false)}
                   </Typography>
                 </Stack>
               </Box>

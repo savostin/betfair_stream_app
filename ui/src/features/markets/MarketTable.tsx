@@ -10,7 +10,7 @@ import { useNotifications } from '@hooks/notificationsContext'
 import { useMarketProfitAndLoss } from '@hooks/useMarketProfitAndLoss'
 import { quickPlaceBet } from '@betfair'
 import type { Side } from '@betfair/types/common'
-import { formatMoney } from '@lib/format'
+import { formatAmount, formatDateTime, formatMoney, formatPl } from '@lib/format'
 import { getPriceLadderDepth } from '@lib/storage'
 import { LtpCell } from './cells/LtpCell'
 import { PriceAmountCell } from './cells/PriceAmountCell'
@@ -28,7 +28,8 @@ export function MarketTable(): React.ReactNode {
   const [priceDepth, setPriceDepth] = useState<number>(() => getPriceLadderDepth())
 
   const dash = t('common:placeholder.dash')
-  const formatAmount = (n: number) => formatMoney(n, dash, accountCurrency ?? undefined)
+  const formatAmountWithCurrency = (n: number | null) => formatAmount(n, dash, accountCurrency)
+  const formatPlWithCurrency = (value: number | null) => formatPl(value, '\u00a0', accountCurrency)
 
   const handleQuickPlace = async (selectionId: number, side: Side, price: number, runnerName: string) => {
     if (!selectedMarket) return
@@ -77,7 +78,7 @@ export function MarketTable(): React.ReactNode {
     .map(r => ({ ...r, def: snapshot?.marketDefinition?.runners?.find(rd => rd.id === r.selectionId) }))
     .filter((r) => r.def?.status !== 'HIDDEN');
 
-  const matchedVolume = marketTradedVolume ?? selectedMarket.totalMatched
+  const matchedVolume = marketTradedVolume ?? selectedMarket.totalMatched ?? null
   const marketStatus = snapshot?.marketDefinition?.status === 'OPEN' && snapshot?.marketDefinition?.inPlay ? 'IN-PLAY' : snapshot?.marketDefinition?.status ?? 'OPEN'
 
   // Use lighter/darker variants for sticky header to avoid transparency issues
@@ -116,14 +117,14 @@ export function MarketTable(): React.ReactNode {
               </Typography>
             )}
             <Typography variant="caption" color="text.secondary">
-              {selectedMarket.marketStartTime ? new Date(selectedMarket.marketStartTime).toLocaleString() : ''}
+              {selectedMarket.marketStartTime ? formatDateTime(selectedMarket.marketStartTime, dash, false) : ''}
             </Typography>
           </Stack>
         </Box>
 
         <Box sx={{ textAlign: { xs: 'left', sm: 'right' } }}>
           <Typography variant="caption" color="text.secondary" display="block" sx={{ lineHeight: 1.2 }}>
-            {t('markets:meta.matched', { amount: formatMoney(matchedVolume, dash, accountCurrency ?? undefined) })}
+            {t('markets:meta.matched', { amount: formatMoney(matchedVolume, dash, accountCurrency) })}
           </Typography>
         </Box>
       </Stack>
@@ -154,8 +155,8 @@ export function MarketTable(): React.ReactNode {
               const l2 = best?.lay[1]
               const l3 = best?.lay[2]
               const depth = priceDepth === 3 ? 3 : 1
-              const ltp = best?.ltp
-              const runnerTv = best?.tv
+              const ltp = best?.ltp ?? null
+              const runnerTv = best?.tv ?? null
               const pnl = pnlBySelection.get(r.selectionId)
               const ifWin = pnl?.ifWin
               const ifLose = pnl?.ifLose
@@ -198,10 +199,10 @@ export function MarketTable(): React.ReactNode {
                           }}
                         >
                           {ifWin !== undefined && ifWin !== 0
-                            ? `${ifWin > 0 ? '+' : ''}${formatMoney(ifWin, dash, accountCurrency ?? undefined)}`
+                            ? formatPlWithCurrency(ifWin)
                             : ifLose !== undefined && ifLose !== 0
-                              ? `${ifLose > 0 ? '+' : ''}${formatMoney(ifLose, dash, accountCurrency ?? undefined)}`
-                              : ' '}
+                              ? formatPlWithCurrency(ifLose)
+                              : '\u00a0'}
                         </Typography>
                       )}
                     </Box>
@@ -223,7 +224,7 @@ export function MarketTable(): React.ReactNode {
                         )}
                         {r.def?.removalDate && (
                           <Typography variant="caption" sx={{ fontSize: '0.8rem' }}>
-                            {new Date(r.def.removalDate).toLocaleDateString()} {new Date(r.def.removalDate).toLocaleTimeString()}
+                            {formatDateTime(r.def.removalDate, dash, false)}
                           </Typography>
                         )}
                       </Box>
@@ -231,10 +232,10 @@ export function MarketTable(): React.ReactNode {
                     :
                     <>{depth === 3 &&
                       <TableCell align="center" sx={{ bgcolor: backCellBg, width: 76, borderRight: 1, borderRightColor: theme.palette.background.default, py: 0.3, px: 0.4 }}>
-                        <PriceAmountCell price={b3?.price} amount={b3?.size} formatAmount={formatAmount} />
+                        <PriceAmountCell price={b3?.price} amount={b3?.size} formatAmount={formatAmountWithCurrency} />
                       </TableCell>}
                       {depth === 3 && <TableCell align="center" sx={{ bgcolor: backCellBg, width: 76, borderRight: 1, borderRightColor: theme.palette.background.default, py: 0.3, px: 0.4 }}>
-                        <PriceAmountCell price={b2?.price} amount={b2?.size} formatAmount={formatAmount} />
+                        <PriceAmountCell price={b2?.price} amount={b2?.size} formatAmount={formatAmountWithCurrency} />
                       </TableCell>}
                       <TableCell
                         align="center"
@@ -250,49 +251,50 @@ export function MarketTable(): React.ReactNode {
                         <PriceAmountCell
                           price={b1?.price}
                           amount={b1?.size}
-                          formatAmount={formatAmount}
+                          formatAmount={formatAmountWithCurrency}
                           onClick={b1?.price ? () => handleQuickPlace(r.selectionId, 'BACK', b1.price, r.runnerName) : undefined}
                           clickable={b1?.price !== undefined}
                         />
                       </TableCell>
-                    <TableCell align="center" sx={{ fontWeight: 800, width: 60, py: 0.3 }}>
-                      <LtpCell ltp={ltp} runnerTv={runnerTv} marketTv={matchedVolume} />
-                    </TableCell>
-                    <TableCell
-                      align="center"
-                      sx={{
-                        bgcolor: layCellBg,
-                        width: depth === 3 ? 78 : 90,
-                        py: 0.3,
-                        px: 0.4,
-                        borderRight: depth === 3 ? 1 : 0,
-                        borderRightColor: theme.palette.background.default,
-                        '&:hover': l1?.price ? { bgcolor: layHeaderBg } : {},
-                        transition: 'background-color 0.15s ease-in-out',
-                      }}
-                    >
-                      <PriceAmountCell
-                        price={l1?.price}
-                        amount={l1?.size}
-                        formatAmount={formatAmount}
-                        onClick={l1?.price ? () => handleQuickPlace(r.selectionId, 'LAY', l1.price, r.runnerName) : undefined}
-                        clickable={l1?.price !== undefined}
-                      />
-                    </TableCell>
-                  {depth === 3 && (
-                    <TableCell align="center" sx={{ bgcolor: layCellBg, width: 76, borderRight: 1, borderRightColor: theme.palette.background.default, py: 0.3, px: 0.4 }}>
-                      <PriceAmountCell price={l2?.price} amount={l2?.size} formatAmount={formatAmount} />
-                    </TableCell>
-                  )}
-                  {depth === 3 && (
-                    <TableCell align="center" sx={{ bgcolor: layCellBg, width: 76, py: 0.3, px: 0.4 }}>
-                      <PriceAmountCell price={l3?.price} amount={l3?.size} formatAmount={formatAmount} />
-                    </TableCell>
-                  )}
-                  </>}
+                      <TableCell align="center" sx={{ fontWeight: 800, width: 60, py: 0.3 }}>
+                        <LtpCell ltp={ltp} runnerTv={runnerTv} marketTv={matchedVolume} />
+                      </TableCell>
+                      <TableCell
+                        align="center"
+                        sx={{
+                          bgcolor: layCellBg,
+                          width: depth === 3 ? 78 : 90,
+                          py: 0.3,
+                          px: 0.4,
+                          borderRight: depth === 3 ? 1 : 0,
+                          borderRightColor: theme.palette.background.default,
+                          '&:hover': l1?.price ? { bgcolor: layHeaderBg } : {},
+                          transition: 'background-color 0.15s ease-in-out',
+                        }}
+                      >
+                        <PriceAmountCell
+                          price={l1?.price}
+                          amount={l1?.size}
+                          formatAmount={formatAmountWithCurrency}
+                          onClick={l1?.price ? () => handleQuickPlace(r.selectionId, 'LAY', l1.price, r.runnerName) : undefined}
+                          clickable={l1?.price !== undefined}
+                        />
+                      </TableCell>
+                      {depth === 3 && (
+                        <TableCell align="center" sx={{ bgcolor: layCellBg, width: 76, borderRight: 1, borderRightColor: theme.palette.background.default, py: 0.3, px: 0.4 }}>
+                          <PriceAmountCell price={l2?.price} amount={l2?.size} formatAmount={formatAmountWithCurrency} />
+                        </TableCell>
+                      )}
+                      {depth === 3 && (
+                        <TableCell align="center" sx={{ bgcolor: layCellBg, width: 76, py: 0.3, px: 0.4 }}>
+                          <PriceAmountCell price={l3?.price} amount={l3?.size} formatAmount={formatAmountWithCurrency} />
+                        </TableCell>
+                      )}
+                    </>}
                 </TableRow>
-            )})
-          }
+              )
+            })
+            }
           </TableBody>
         </Table>
       </TableContainer>

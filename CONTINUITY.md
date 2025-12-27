@@ -33,6 +33,8 @@
 ## State:
 - Now:
   - Runner status filtering & display complete. HIDDEN runners hidden completely. REMOVED runners: all price cells (back depth 3, b1, LTP, lay depth 3) joined into single colspan cell showing adjustment factor (×0.5) and removal date/time centered on light error background. ACTIVE/WINNER/LOSER rows show normally. Build succeeds.
+  - P/L rendering uses new `formatPl` helper for consistent sign/formatting. UI build not yet rerun after this change; previous attempt accidentally launched the Rust app and was cancelled.
+  - Added shared date/time format helpers (`formatDate`, `formatTime`, `formatDateTime` with optional seconds) in `ui/src/lib/format.ts`.
 
 - Done:
   - DMG packaging script and workflow wiring.

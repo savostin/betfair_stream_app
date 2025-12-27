@@ -2,7 +2,7 @@ import { Box, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { formatPrice } from '@lib/price'
 
-export function LtpCell(props: { ltp?: number; runnerTv?: number; marketTv?: number }): React.ReactNode {
+export function LtpCell(props: { ltp: number | null; runnerTv: number | null; marketTv?: number | null }): React.ReactNode {
   const { t } = useTranslation('common')
   const { ltp, runnerTv, marketTv } = props
 
