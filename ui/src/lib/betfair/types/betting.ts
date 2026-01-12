@@ -53,13 +53,13 @@ export interface MarketCatalogue {
   totalMatched?: number
   marketStartTime?: string
   runners?: MarketCatalogueRunner[]
-  event?: {
-    id?: string
-    name?: string
-    countryCode?: string
-    timezone?: string
-    venue?: string
-    openDate?: string
+  event: {
+    id: string
+    name: string
+    countryCode: string
+    timezone: string
+    venue: string
+    openDate: string
   }
   competition?: {
     id?: string

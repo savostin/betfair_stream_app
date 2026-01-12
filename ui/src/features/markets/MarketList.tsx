@@ -56,12 +56,12 @@ export function MarketList(): React.ReactNode {
               title={m.marketId}
             >
               <Box sx={{ width: '100%' }}>
-                <Typography sx={{ fontSize: 13, fontWeight: 700, lineHeight: 1.2 }}>{m.marketName}</Typography>
+                <Typography sx={{ fontSize: 13, fontWeight: 700, lineHeight: 1.2 }}>{m.event?.name ?? ''}</Typography>
                 <Stack direction="row" justifyContent="space-between" sx={{ mt: 0.5 }}>
-                  <Typography variant="caption" color="text.secondary" noWrap>
-                    {m.event?.name ?? ''}
+                  <Typography variant="caption" noWrap>
+                    {m.marketName}
                   </Typography>
-                  <Typography variant="caption" color="text.secondary" noWrap>
+                  <Typography variant="caption" noWrap>
                     {formatTime(m.marketStartTime, '–', false)}
                   </Typography>
                 </Stack>

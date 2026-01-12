@@ -27,9 +27,13 @@ export async function listNextHorseWinMarkets(): Promise<MarketCatalogue[]> {
     {
       marketProjection: ['RUNNER_DESCRIPTION', 'EVENT', 'MARKET_START_TIME'],
       sort: 'FIRST_TO_START',
-      maxResults: 100,
+      maxResults: 20,
     },
   )
+  .then((markets) => markets.map((m) => {
+    m.event.name = m.event?.name.replace(/\s\d{1,2}(st|nd|rd|th)\s+\w{1,3}/i, '') ?? ''
+    return m;
+  }))
 }
 
 /**

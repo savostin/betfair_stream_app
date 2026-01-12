@@ -74,9 +74,14 @@ export function MarketTable(): React.ReactNode {
 
   const runners = (selectedMarket.runners ?? [])
     .slice()
-    .sort((a, b) => (a.sortPriority ?? 0) - (b.sortPriority ?? 0))
     .map(r => ({ ...r, def: snapshot?.marketDefinition?.runners?.find(rd => rd.id === r.selectionId) }))
-    .filter((r) => r.def?.status !== 'HIDDEN');
+    .filter((r) => r.def?.status !== 'HIDDEN')
+    .sort((a, b) => a.def?.status == 'REMOVED' ? 1 : (b.def?.status == 'REMOVED' ? -1 : (a.sortPriority ?? 0) - (b.sortPriority ?? 0)))
+
+  const activeRunners = runners
+    .slice()
+    .filter((r) => r.def?.status !== 'REMOVED');
+
 
   const matchedVolume = marketTradedVolume ?? selectedMarket.totalMatched ?? null
   const marketStatus = snapshot?.marketDefinition?.status === 'OPEN' && snapshot?.marketDefinition?.inPlay ? 'IN-PLAY' : snapshot?.marketDefinition?.status ?? 'OPEN'
@@ -133,7 +138,7 @@ export function MarketTable(): React.ReactNode {
         <Table size="small" stickyHeader sx={{ '& td, & th': { py: 0.3, px: 0.5 } }}>
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontWeight: 800, width: { xs: 138, sm: 188 }, bgcolor: alpha(theme.palette.grey[theme.palette.mode === 'dark' ? 900 : 100], 0.8), backdropFilter: 'blur(3px)', py: 0.3, px: 0.4 }}>{t('markets:table.selection')}</TableCell>
+              <TableCell align="center" sx={{ fontWeight: 800, width: { xs: 138, sm: 188 }, bgcolor: alpha(theme.palette.grey[theme.palette.mode === 'dark' ? 900 : 100], 0.8), backdropFilter: 'blur(3px)', py: 0.3, px: 0.4 }}>{t('markets:table.selection', { count: activeRunners.length })}</TableCell>
               <TableCell align="center" colSpan={priceDepth} sx={{ fontWeight: 800, bgcolor: backHeaderBg, backdropFilter: 'blur(3px)', py: 0.35 }}>
                 {t('markets:table.back')}
               </TableCell>
@@ -163,6 +168,8 @@ export function MarketTable(): React.ReactNode {
 
               const runnerStatus = r.def?.status ?? 'ACTIVE'
               const isRemoved = runnerStatus === 'REMOVED'
+              const isWinner = runnerStatus === 'WINNER'
+              const isLoser = runnerStatus === 'LOSER'
 
               return (
                 <TableRow key={r.selectionId} hover sx={{ opacity: isRemoved ? 0.5 : 1 }}>
@@ -207,7 +214,7 @@ export function MarketTable(): React.ReactNode {
                       )}
                     </Box>
                   </TableCell>
-                  {isRemoved ?
+                  {isRemoved || isWinner || isLoser ?
                     <TableCell
                       colSpan={depth === 3 ? 7 : 3}
                       align="center"
@@ -217,14 +224,25 @@ export function MarketTable(): React.ReactNode {
                       }}
                     >
                       <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1, alignItems: 'center', justifyContent: 'center' }}>
-                        {r.def?.adjustmentFactor !== undefined && (
-                          <Typography variant="caption" sx={{ fontSize: '0.8rem' }}>
-                            {r.def.adjustmentFactor.toFixed(2)}%
+                        {isRemoved && (<>
+                          {r.def?.adjustmentFactor !== undefined && (
+                            <Typography variant="caption" sx={{ fontSize: '0.8rem' }}>
+                              {r.def.adjustmentFactor.toFixed(2)}%
+                            </Typography>
+                          )}
+                          {r.def?.removalDate && (
+                            <Typography variant="caption" sx={{ fontSize: '0.8rem' }}>
+                              {formatDateTime(r.def.removalDate, dash, false)}
+                            </Typography>
+                          )}</>)}
+                        {isWinner && (
+                          <Typography variant="caption" sx={{ fontSize: '1.2rem', color: 'success.main', fontWeight: 900 }}>
+                            {t('markets:table.result.winner')}
                           </Typography>
                         )}
-                        {r.def?.removalDate && (
-                          <Typography variant="caption" sx={{ fontSize: '0.8rem' }}>
-                            {formatDateTime(r.def.removalDate, dash, false)}
+                        {isLoser && (
+                          <Typography variant="caption" sx={{ fontSize: '1.2rem', color: 'error.main', fontWeight: 900 }}>
+                            {t('markets:table.result.loser')}
                           </Typography>
                         )}
                       </Box>

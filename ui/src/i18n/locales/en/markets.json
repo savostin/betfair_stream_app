@@ -24,10 +24,15 @@
     "matched": "Matched: {{amount}}"
   },
   "table": {
-    "selection": "Selection",
+    "selection_one": "{{count}} selection",
+    "selection_other": "{{count}} selections",
     "back": "Back",
     "ltp": "LTP",
-    "lay": "Lay"
+    "lay": "Lay",
+    "result": {
+      "winner": "WINNER",
+      "loser": "LOSER"
+    }
   },
   "bet": {
     "placed": "{{side}} bet placed on {{runner}}",

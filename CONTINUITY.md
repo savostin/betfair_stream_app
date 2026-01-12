@@ -113,6 +113,8 @@
     - Added price ladder depth setting (best only vs best 3), stored in settings and applied to market table rendering.
   - Verified builds: `cargo build` and `npm --prefix ui run build` both succeed.
 
+- Pluralized market table selection header using runner count; en/es translations use i18n plural forms.
+
   ## Key decisions (update):
   - Separated general Betfair API methods into `ui/src/lib/betfair/api/` (`account.ts`, `betting.ts`).
   - Kept custom convenience wrappers in `ui/src/lib/betfair/` (e.g., `listNextHorseWinMarkets`, `quickPlaceBet`).
@@ -163,4 +165,18 @@
 - ui/src/lib/betfair/index.ts
 - src/ (Tauri app)
 - tauri.conf.json
+
+## Now:
+- Market table selection header pluralized with runner count; locales updated (en/es).
+
+## Next:
+- None.
+
+## Open questions (UNCONFIRMED if any):
+- None.
+
+## Working set (files/ids/commands):
+- ui/src/features/markets/MarketTable.tsx
+- ui/src/i18n/locales/en/markets.json
+- ui/src/i18n/locales/es/markets.json
 

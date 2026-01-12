@@ -24,10 +24,15 @@
     "matched": "Igualado: {{amount}}"
   },
   "table": {
-    "selection": "Selección",
+    "selection_one": "{{count}} selección",
+    "selection_other": "{{count}} selecciones",
     "back": "Back",
     "ltp": "LTP",
-    "lay": "Lay"
+    "lay": "Lay",
+    "result": {
+      "winner": "GANADOR",
+      "loser": "PERDEDOR"
+    }
   },
   "bet": {
     "placed": "Apuesta {{side}} colocada en {{runner}}",
