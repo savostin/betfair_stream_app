@@ -14,6 +14,12 @@ import esMarkets from './locales/es/markets.json'
 import esSettings from './locales/es/settings.json'
 import esErrors from './locales/es/errors.json'
 
+import ruCommon from './locales/ru/common.json'
+import ruAuth from './locales/ru/auth.json'
+import ruMarkets from './locales/ru/markets.json'
+import ruSettings from './locales/ru/settings.json'
+import ruErrors from './locales/ru/errors.json'
+
 // NOTE: This module intentionally performs one-time i18n initialization as a side-effect.
 // Import it once (e.g. in main.tsx) before rendering.
 
@@ -22,7 +28,7 @@ void i18n
   .use(initReactI18next)
   .init({
     fallbackLng: 'en',
-    supportedLngs: ['en', 'es'],
+    supportedLngs: ['en', 'es', 'ru'],
     defaultNS: 'common',
     ns: ['common', 'auth', 'markets', 'settings', 'errors'],
     resources: {
@@ -39,6 +45,13 @@ void i18n
         markets: esMarkets,
         settings: esSettings,
         errors: esErrors,
+      },
+      ru: {
+        common: ruCommon,
+        auth: ruAuth,
+        markets: ruMarkets,
+        settings: ruSettings,
+        errors: ruErrors,
       },
     },
     detection: {
