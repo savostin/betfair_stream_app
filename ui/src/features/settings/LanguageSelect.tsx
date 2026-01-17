@@ -1,7 +1,7 @@
 import { FormControl, InputLabel, MenuItem, Select, type SelectChangeEvent } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
-const LANGS = ['en', 'es'] as const
+const LANGS = ['en', 'es', 'ru'] as const
 export type AppLanguage = (typeof LANGS)[number]
 
 function isAppLanguage(v: string): v is AppLanguage {
@@ -32,6 +32,7 @@ export function LanguageSelect(props: { fullWidth?: boolean; size?: 'small' | 'm
       >
         <MenuItem value="en">{t('common:language.en')}</MenuItem>
         <MenuItem value="es">{t('common:language.es')}</MenuItem>
+        <MenuItem value="ru">{t('common:language.ru')}</MenuItem>
       </Select>
     </FormControl>
   )

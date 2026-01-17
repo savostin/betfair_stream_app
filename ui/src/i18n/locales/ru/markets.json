@@ -1,0 +1,26 @@
+{
+  "panel": {
+    "title": "Рынки"
+  },
+  "empty": {
+    "noMarkets": "Рынки не загружены.",
+    "selectTitle": "Выберите рынок",
+    "selectSubtitle": "Выберите рынок слева для подписки."
+  },
+  "toast": {
+    "loadedMarkets": "Загружено {{count}} рынков"
+  },
+  "status": {
+    "connecting": "Подключение/подписка…"
+  },
+  "meta": {
+    "marketId": "marketId: {{id}}",
+    "matched": "Сопоставлено: {{amount}}"
+  },
+  "table": {
+    "selection": "Выбор",
+    "back": "За",
+    "ltp": "LTP",
+    "lay": "Против"
+  }
+}

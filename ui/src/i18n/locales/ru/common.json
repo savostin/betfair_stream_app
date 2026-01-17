@@ -1,0 +1,18 @@
+{
+  "app": {
+    "title": "Betfair Markets (WIN)"
+  },
+  "actions": {
+    "refresh": "Обновить",
+    "loading": "Загрузка…",
+    "back": "Назад"
+  },
+  "placeholder": {
+    "dash": "-"
+  },
+  "language": {
+    "en": "Английский",
+    "es": "Испанский",
+    "ru": "Русский"
+  }
+}

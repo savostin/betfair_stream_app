@@ -1,0 +1,52 @@
+{
+  "validation": {
+    "appKeyRequired": "Требуется ключ приложения",
+    "usernameRequired": "Требуется имя пользователя",
+    "passwordRequired": "Требуется пароль"
+  },
+  "unexpected": {
+    "title": "Что-то пошло не так",
+    "withDetails": "Что-то пошло не так: {{details}}"
+  },
+  "auth": {
+    "notLoggedIn": "Вы не вошли в систему"
+  },
+  "betfair": {
+    "identity": {
+      "invalidResponse": "Вход не выполнен из-за неожиданного ответа (status={{httpStatus}}, content-type={{contentType}}, code={{code}})",
+      "missingSessionToken": "Вход выполнен успешно, но токен сеанса не был возвращён (status={{httpStatus}}, content-type={{contentType}}, code={{code}})",
+      "INVALID_USERNAME_OR_PASSWORD": "Неверное имя пользователя или пароль ({{code}})",
+      "ACCOUNT_LOCKED": "Учётная запись заблокирована ({{code}})",
+      "ACCOUNT_SUSPENDED": "Учётная запись приостановлена ({{code}})",
+      "INVALID_APP_KEY": "Неверный ключ приложения ({{code}})",
+      "INVALID_CONNECTIVITY_TO_REGULATOR_DK": "Ошибка подключения к регулятору (DK) ({{code}})",
+      "INVALID_CONNECTIVITY_TO_REGULATOR_IT": "Ошибка подключения к регулятору (IT) ({{code}})",
+      "INVALID_CONNECTIVITY_TO_REGULATOR_NZ": "Ошибка подключения к регулятору (NZ) ({{code}})",
+      "KYC_SUSPEND": "Учётная запись приостановлена (KYC) ({{code}})",
+      "PENDING_AUTH": "Требуется дополнительная аутентификация ({{code}})",
+      "SECURITY_QUESTION_WRONG_3X": "Слишком много неудачных попыток ответа на контрольный вопрос ({{code}})",
+      "SELF_EXCLUDED": "Учётная запись самоисключена ({{code}})",
+      "TOO_MANY_REQUESTS": "Слишком много запросов, попробуйте позже ({{code}})",
+      "unknown": "Вход не выполнен ({{code}})"
+    },
+    "rpc": {
+      "failed": "Ошибка Betfair RPC (status={{httpStatus}}, code={{code}}, message={{message}})",
+      "invalidResponse": "Betfair RPC вернул неожиданный ответ (status={{httpStatus}})"
+    },
+    "api": {
+      "listMarketCatalogueFailed": "Ошибка listMarketCatalogue ({{status}})",
+      "listMarketCatalogueFailedWithDetails": "Ошибка listMarketCatalogue ({{status}}): {{details}}"
+    }
+  },
+  "stream": {
+    "websocketConnected": "WebSocket подключён",
+    "websocketDisconnected": "WebSocket отключён",
+    "websocketError": "Ошибка WebSocket",
+    "authenticated": "Аутентификация выполнена",
+    "authenticationFailed": "Ошибка аутентификации",
+    "authenticationFailedWithDetails": "Ошибка аутентификации: {{details}}",
+    "subscriptionFailed": "Ошибка подписки",
+    "subscriptionFailedWithDetails": "Ошибка подписки: {{details}}",
+    "connectionId": "connectionId={{id}}"
+  }
+}
