@@ -1,3 +1,10 @@
+import { LanguageSelect } from '@features/settings/LanguageSelect'
+import { ThemeModeToggle } from '@features/settings/ThemeModeToggle'
+import { useAccountContext } from '@hooks/accountContext'
+import { useNavigation } from '@hooks/navigationContext'
+import { useNotifications } from '@hooks/notificationsContext'
+import { useSessionContext } from '@hooks/sessionContext'
+import { formatMoney } from '@lib/format'
 import {
   Alert,
   AppBar,
@@ -12,13 +19,6 @@ import {
 } from '@mui/material'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { LanguageSelect } from '@features/settings/LanguageSelect'
-import { ThemeModeToggle } from '@features/settings/ThemeModeToggle'
-import { useAccountContext } from '@hooks/accountContext'
-import { useNavigation } from '@hooks/navigationContext'
-import { useNotifications } from '@hooks/notificationsContext'
-import { useSessionContext } from '@hooks/sessionContext'
-import { formatMoney, getCurrencySymbol } from '@lib/format'
 
 export function AppShell(props: {
   children: React.ReactNode
@@ -52,7 +52,7 @@ export function AppShell(props: {
           <Stack direction="row" spacing={1} alignItems="center">
             {session.isAuthed && account.funds?.availableToBetBalance != null ? (
               <Chip
-                label={`${getCurrencySymbol(account.accountCurrency)}${formatMoney(account.funds.availableToBetBalance, '0.00')}`}
+                label={formatMoney(account.funds.availableToBetBalance, '0.00', account.accountCurrency)}
                 size="small"
                 color="primary"
                 variant="outlined"
